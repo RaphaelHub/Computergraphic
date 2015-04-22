@@ -1,0 +1,10 @@
+# simple .gitignore file for c programming
+
+*.o
+*.out
+
+# ignore executable
+merry-go-around
+
+# ignore vim swap files
+*.swp
