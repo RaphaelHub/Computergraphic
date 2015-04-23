@@ -103,6 +103,25 @@ void SetRotationZ(float anglez, float* result)
     memcpy(result, temp, 16*sizeof(float));
 }
 
+/******************************************************************
+*
+* SetScaling
+*
+*******************************************************************/
+
+void SetScaling(float x, float y, float z, float* result) 
+{
+	float temp[16] = 
+  {
+      x,    0.0,  0.0,  0.0,
+      0.0,  y,    0.0,  0.0,
+      0.0,  0.0,  z,    0.0,
+      0.0,  0.0,  0.0,  1.0
+  };
+
+  memcpy(result, temp, 16*sizeof(float));
+
+}
 
 /******************************************************************
 *

@@ -4,7 +4,7 @@
 *
 * Description: 
 *
-* Authors: Raphael Gruber, Parick Franz
+* Authors: Raphael Gruber, Patrick Franz
 * 
 * Computer Graphics Proseminar SS 2015
 * 
@@ -13,6 +13,9 @@
 * University of Innsbruck
 *
 *******************************************************************/
+
+/* for Windows*/
+#define GLEW_STATIC
 
 /* Standard includes */
 #include <stdio.h>
@@ -29,18 +32,19 @@
 #include "LoadShader.h"   /* Provides loading function for shader code */
 #include "Matrix.h"  
 #include "Octagon.h"
+#include "Pyramid.h"
 
 
 /*----------------------------------------------------------------*/
 
 /* Define handle to a vertex buffer object */
-GLuint VBO;
+GLuint VBO[3];
 
 /* Define handle to a color buffer object */
-GLuint CBO; 
+GLuint CBO[3]; 
 
 /* Define handle to an index buffer object */
-GLuint IBO;
+GLuint IBO[3];
 
 
 /* Indices to vertex attributes; in this case positon and color */ 
@@ -54,7 +58,7 @@ GLuint ShaderProgram;
 
 float ProjectionMatrix[16]; /* Perspective projection matrix */
 float ViewMatrix[16]; /* Camera view matrix */ 
-float ModelMatrix[16]; /* Model matrix */ 
+float ModelMatrix[3][16]; /* Model matrix */ 
 
 /* Transformation matrices for initial position */
 float TranslateOrigin[16];
@@ -64,197 +68,32 @@ float RotateZ[16];
 float InitialTransform[16];
 
 
-GLfloat vertex_buffer_data[] = { /* 2 ocatagon and a pyramide vertices XYZ */
-		/*bottom*/
-		
-		/*first octagon*/
-    -2.0,  0.5,  2.0,
-     0.0,  0.5,  3.0,
-     2.0,  0.5,  2.0,
-     3.0,  0.5,  0.0,
-     2.0,  0.5, -2.0,
-     0.0,  0.5, -3.0,
-    -2.0,  0.5, -2.0,
-    -3.0,  0.5,  0.0,
-    
-		/*second octagon*/
-    -2.0, 1.0,  2.0,
-     0.0,  1.0,  3.0,
-     2.0,  1.0,  2.0,
-     3.0,  1.0,  0.0,
-     2.0,  1.0, -2.0,
-     0.0,  1.0, -3.0,
-    -2.0,  1.0, -2.0,
-    -3.0,  1.0,  0.0,
-    
-		/*top*/
-    -1.5,  4.0, -1.5,
-     1.5,  4.0, -1.5,
-    -1.5,  4.0,  1.5,
-     1.5,  4.0,  1.5,
-     0.0,  5.0,  0.0,
-     
-		/*main bar*/
-	-0.2,  1.0,  0.2,
-     0.0,  1.0,  0.3,
-     0.2,  1.0,  0.2,
-     0.3,  1.0,  0.0,
-     0.2,  1.0, -0.2,
-     0.0,  1.0, -0.3,
-    -0.2,  1.0, -0.2,
-    -0.3,  1.0,  0.0,
-    
-    -0.2,  4.0,  0.2,
-     0.0,  4.0,  0.3,
-     0.2,  4.0,  0.2,
-     0.3,  4.0,  0.0,
-     0.2,  4.0, -0.2,
-     0.0,  4.0, -0.3,
-    -0.2,  4.0, -0.2,
-    -0.3,  4.0,  0.0,
-};   
+GLfloat vertex_buffer_data1[sizeof(vertex_octagon)]; 
+GLfloat vertex_buffer_data2[sizeof(vertex_pyramid)];  
+GLfloat vertex_buffer_data3[sizeof(vertex_octagon)]; 
 
-GLfloat color_buffer_data[] = { /* RGB color values for the vertices */
-    1.0, 0.0, 0.0,
-    1.0, 0.0, 0.0,
-    1.0, 0.0, 0.0,
-    1.0, 0.0, 0.0,
-    1.0, 0.0, 0.0,
-    1.0, 0.0, 0.0,
-    1.0, 0.0, 0.0,
-    1.0, 0.0, 0.0,
-    
-    0.0, 1.0, 0.0,
-    0.0, 1.0, 0.0,
-    0.0, 1.0, 0.0,
-    0.0, 1.0, 0.0,
-    0.0, 1.0, 0.0,
-    0.0, 1.0, 0.0,
-    0.0, 1.0, 0.0,
-    0.0, 1.0, 0.0,
-    
-		/*top*/
-    1.0, 0.0, 0.0,
-    1.0, 0.0, 0.0,
-    1.0, 0.0, 0.0,
-    1.0, 0.0, 0.0,
-    0.0, 1.0, 0.0,
-    
-    0.0, 0.0, 1.0,
-    0.0, 0.0, 1.0,
-    0.0, 0.0, 1.0,
-    0.0, 0.0, 1.0,
-    0.0, 0.0, 1.0,
-    0.0, 0.0, 1.0,
-    0.0, 0.0, 1.0,
-    0.0, 0.0, 1.0,
-    
-    0.0, 0.0, 1.0,
-    0.0, 0.0, 1.0,
-    0.0, 0.0, 1.0,
-    0.0, 0.0, 1.0,
-    0.0, 0.0, 1.0,
-    0.0, 0.0, 1.0,
-    0.0, 0.0, 1.0,
-    0.0, 0.0, 1.0,
-}; 
+GLfloat color_buffer_data1[sizeof(color_octagon)];
+GLfloat color_buffer_data2[sizeof(color_pyramid)];
+GLfloat color_buffer_data3[sizeof(color_octagon)];
 
-GLushort index_buffer_data[] = { /* Indices of 6*2 triangles (6 sides) */
 
-	/*bottom*/
-	/*first octagon*/
-    0, 1, 2,
-    2, 3, 4,
-    4, 5, 6,
-    6, 7, 0,
-    0,6,2,
-    4,6,2,
-    
-    /*second octagon*/
-    8, 9, 10,
-    10, 11, 12,
-    12, 13, 14,
-    14, 15, 8,
-    8,14,10,
-    12,14,10,
-    
-    /*triangels between first and second*/
-    0,1,8,
-    1,2,9,
-    2,3,10,
-    3,4,11,
-    4,5,12,
-    5,6,13,
-    6,7,14,
-    7,0,15,
-    
-    /*triangels between second and first*/
-    8,9,1,
-    9,10,2,
-    10,11,3,
-    11,12,4,
-    12,13,5,
-    13,14,6,
-    14,15,7,
-    15,8,0,
-
-	/*top*/
-    16, 17, 18,
-    18, 19, 17,
-    16, 17, 20,
-    17, 19, 20,
-    18, 19, 20,
-    18, 20, 16,
-    
-    /*main bar*/
-    21,22,29,
-    22,23,30,
-    23,24,31,
-    24,25,32,
-    25,26,33,
-    26,27,34,
-    27,28,35,
-    28,21,36,
-    
-     29,30,22,
-    30,31,23,
-    31,32,24,
-    32,33,25,
-    33,34,26,
-    34,35,27,
-    35,36,28,
-    36,29,21,
-
-};
+GLushort index_buffer_data1[sizeof(index_octagon)];
+GLushort index_buffer_data2[sizeof(index_pyramid)];
+GLushort index_buffer_data3[sizeof(index_octagon)];
     
 /*----------------------------------------------------------------*/
 
-
-/******************************************************************
-*
-* Display
-*
-* This function is called when the content of the window needs to be
-* drawn/redrawn. It has been specified through 'glutDisplayFunc()';
-* Enable vertex attributes, create binding between C program and 
-* attribute name in shader
-*
-*******************************************************************/
-
-void Display()
-{
-    /* Clear window; color specified in 'Initialize()' */
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+void DisplayOneObject(int i) {
     glEnableVertexAttribArray(vPosition);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[i]);
     glVertexAttribPointer(vPosition, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glEnableVertexAttribArray(vColor);
-    glBindBuffer(GL_ARRAY_BUFFER, CBO);
+    glBindBuffer(GL_ARRAY_BUFFER, CBO[i]);
     glVertexAttribPointer(vColor, 3, GL_FLOAT,GL_FALSE, 0, 0);   
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[i]);
     GLint size; 
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 
@@ -281,7 +120,7 @@ void Display()
         fprintf(stderr, "Could not bind uniform ModelMatrix\n");
         exit(-1);
     }
-   glUniformMatrix4fv(RotationUniform, 1, GL_TRUE, ModelMatrix);  
+    glUniformMatrix4fv(RotationUniform, 1, GL_TRUE, ModelMatrix[i]);  
 
     /* Issue draw command, using indexed triangle list */
     glDrawElements(GL_TRIANGLES, size/sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
@@ -289,7 +128,30 @@ void Display()
     /* Disable attributes */
     glDisableVertexAttribArray(vPosition);
     glDisableVertexAttribArray(vColor);   
+	
+}
 
+
+/******************************************************************
+*
+* Display
+*
+* This function is called when the content of the window needs to be
+* drawn/redrawn. It has been specified through 'glutDisplayFunc()';
+* Enable vertex attributes, create binding between C program and 
+* attribute name in shader
+*
+*******************************************************************/
+
+void Display()
+{
+    	/* Clear window; color specified in 'Initialize()' */
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	int i = 0;
+	for(;i < 3; i++) {
+		DisplayOneObject(i);
+	}
     /* Swap between front and back buffer */ 
     glutSwapBuffers();
 }
@@ -310,10 +172,20 @@ void OnIdle()
 
     /* Time dependent rotation */
     SetRotationY(angle, RotationMatrixAnim);
+    
+    /* scale and translate matrix 3 */
+    float TempTranslate[16];
+    SetTranslation(0, 0.5,0, TempTranslate);
+    MultiplyMatrix(ModelMatrix[2], TempTranslate, ModelMatrix[2]);
+    SetScaling(0.1, 4.0, 0.1,TempTranslate);
+    MultiplyMatrix(ModelMatrix[2], TempTranslate, ModelMatrix[2]);
 
     /* Apply model rotation; finally move cube down */
-    MultiplyMatrix(RotationMatrixAnim, InitialTransform, ModelMatrix);
-    MultiplyMatrix(TranslateDown, ModelMatrix, ModelMatrix);
+    int i = 0;
+    for(; i < 3; i++) {
+		MultiplyMatrix(RotationMatrixAnim, InitialTransform, ModelMatrix[i]);
+		MultiplyMatrix(TranslateDown, ModelMatrix[i], ModelMatrix[i]);
+	}
 
     /* Request redrawing forof window content */  
     glutPostRedisplay();
@@ -330,18 +202,46 @@ void OnIdle()
 
 void SetupDataBuffers()
 {
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data), vertex_buffer_data, GL_STATIC_DRAW);
+    glGenBuffers(1, &VBO[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data1), vertex_buffer_data1, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &IBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data), index_buffer_data, GL_STATIC_DRAW);
+    glGenBuffers(1, &IBO[0]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[0]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data1), index_buffer_data1, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &CBO);
-    glBindBuffer(GL_ARRAY_BUFFER, CBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data), color_buffer_data, GL_STATIC_DRAW);
+    glGenBuffers(1, &CBO[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, CBO[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data1), color_buffer_data1, GL_STATIC_DRAW);
     
+    
+    
+      glGenBuffers(1, &VBO[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data2), vertex_buffer_data2, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &IBO[1]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[1]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data2), index_buffer_data2, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &CBO[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, CBO[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data2), color_buffer_data2, GL_STATIC_DRAW);
+    
+    
+    
+      glGenBuffers(1, &VBO[2]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data3), vertex_buffer_data3, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &IBO[2]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[2]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data3), index_buffer_data3, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &CBO[2]);
+    glBindBuffer(GL_ARRAY_BUFFER, CBO[2]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data3), color_buffer_data3, GL_STATIC_DRAW);
+   
 }
 
 
@@ -464,6 +364,21 @@ void Initialize(void)
     /* Enable depth testing */
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);    
+    
+    /* Transform matrix for the bar in the middle*/
+    
+    /*copy objects into buffer*/
+    memcpy(vertex_buffer_data1, vertex_octagon, sizeof(vertex_octagon));
+    memcpy(vertex_buffer_data2, vertex_pyramid, sizeof(vertex_pyramid));
+    memcpy(vertex_buffer_data3, vertex_octagon, sizeof(vertex_octagon));
+    
+    memcpy(color_buffer_data1, color_octagon, sizeof(color_octagon));
+    memcpy(color_buffer_data2, color_pyramid, sizeof(color_pyramid));
+    memcpy(color_buffer_data3, color_octagon, sizeof(color_octagon));
+    
+    memcpy(index_buffer_data1, index_octagon, sizeof(index_octagon));
+    memcpy(index_buffer_data2, index_pyramid, sizeof(index_pyramid));
+    memcpy(index_buffer_data3, index_octagon, sizeof(index_octagon));
 
     /* Setup vertex, color, and index buffer objects */
     SetupDataBuffers();
@@ -474,7 +389,10 @@ void Initialize(void)
     /* Initialize matrices */
     SetIdentityMatrix(ProjectionMatrix);
     SetIdentityMatrix(ViewMatrix);
-    SetIdentityMatrix(ModelMatrix);
+    int i = 0;
+    for(;i<3;i++) {
+		SetIdentityMatrix(ModelMatrix[i]);
+	}
 
     /* Set projection transform */
     float fovy = 45.0;
