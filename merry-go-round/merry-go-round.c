@@ -35,13 +35,13 @@
 
 /* Define handle to a vertex buffer object */
 GLuint VBO;
-
+GLuint cVBO[4]; // cube vertex buffers
 /* Define handle to a color buffer object */
 GLuint CBO; 
-
+GLuint cCBO[4]; // cube color buffers
 /* Define handle to an index buffer object */
 GLuint IBO;
-
+GLuint cIBO[4]; // cube index buffers
 
 /* Indices to vertex attributes; in this case positon and color */ 
 enum DataID {vPosition = 0, vColor = 1}; 
@@ -114,6 +114,18 @@ GLfloat vertex_buffer_data[] = { /* 2 ocatagon and a pyramide vertices XYZ */
     -0.3,  4.0,  0.0,
 };   
 
+// vertex buffer for the cube
+GLfloat cube_vertex_buffer[] = {
+    -0.5, -0.5, -0.5,
+     0.5, -0.5, -0.5,
+     0.5,  0.5, -0.5,
+    -0.5,  0.5, -0.5,
+    -0.5, -0.5,  0.5,
+     0.5, -0.5,  0.5,
+     0.5,  0.5,  0.5,
+    -0.5,  0.5,  0.5
+};
+
 GLfloat color_buffer_data[] = { /* RGB color values for the vertices */
     1.0, 0.0, 0.0,
     1.0, 0.0, 0.0,
@@ -157,7 +169,19 @@ GLfloat color_buffer_data[] = { /* RGB color values for the vertices */
     0.0, 0.0, 1.0,
     0.0, 0.0, 1.0,
     0.0, 0.0, 1.0,
-}; 
+};
+
+// cube color buffer
+GLfloat cube_color_buffer[] = {
+    0.5, 0.5, 0.5,
+    0.5, 0.5, 0.5,
+    0.5, 0.5, 0.5,
+    0.5, 0.5, 0.5,
+    0.5, 0.5, 0.5,
+    0.5, 0.5, 0.5,
+    0.5, 0.5, 0.5,
+    0.5, 0.5, 0.5
+};
 
 GLushort index_buffer_data[] = { /* Indices of 6*2 triangles (6 sides) */
 
@@ -226,6 +250,27 @@ GLushort index_buffer_data[] = { /* Indices of 6*2 triangles (6 sides) */
     36,29,21,
 
 };
+
+GLushort cube_index_buffer[] = {
+    // ground face
+    0,1,2,
+    0,3,2,
+    // back face
+    0,1,5,
+    0,4,5,
+    // left face
+    0,3,7,
+    0,4,7,
+    // front face
+    6,2,3,
+    6,7,3,
+    // right face
+    6,2,1,
+    6,5,1,
+    // top face
+    6,5,4,
+    6,7,4
+}
     
 /*----------------------------------------------------------------*/
 
