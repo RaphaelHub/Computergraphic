@@ -31,18 +31,20 @@
 #include "Octagon.h"
 #include "Pyramid.h"
 #include "mainBar.h"
-
+#include "cube.h"
 
 /*----------------------------------------------------------------*/
 
+#define OBJECTS 4
+
 /* Define handle to a vertex buffer object */
-GLuint VBO[3];
+GLuint VBO[OBJECTS];
 
 /* Define handle to a color buffer object */
-GLuint CBO[3]; 
+GLuint CBO[OBJECTS]; 
 
 /* Define handle to an index buffer object */
-GLuint IBO[3];
+GLuint IBO[OBJECTS];
 
 
 /* Indices to vertex attributes; in this case positon and color */ 
@@ -69,15 +71,18 @@ float InitialTransform[16];
 GLfloat vertex_buffer_data1[sizeof(vertex_octagon)]; 
 GLfloat vertex_buffer_data2[sizeof(vertex_pyramid)];  
 GLfloat vertex_buffer_data3[sizeof(vertex_mainBar)]; 
+GLfloat vertex_buffer_data4[sizeof(vertex_cube)];
 
 GLfloat color_buffer_data1[sizeof(color_octagon)];
 GLfloat color_buffer_data2[sizeof(color_pyramid)];
 GLfloat color_buffer_data3[sizeof(color_mainBar)];
+GLfloat color_buffer_data4[sizeof(color_cube)];
 
 GLushort index_buffer_data1[sizeof(index_octagon)];
 GLushort index_buffer_data2[sizeof(index_pyramid)];
 GLushort index_buffer_data3[sizeof(index_mainBar)];
-    
+GLushort index_buffer_data4[sizeof(index_cube)];
+
 /*----------------------------------------------------------------*/
 
 void DisplayOneObject(int i) {
@@ -146,7 +151,7 @@ void Display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
 	int i = 0;  
-	for(;i < 3; i++) { 
+	for(;i < OBJECTS; i++) { 
 		DisplayOneObject(i);
 	}  
     /* Swap between front and back buffer */ 
@@ -172,7 +177,7 @@ void OnIdle()
 
     /* Apply model rotation; finally move cube down */
     int i = 0;
-    for(; i < 3; i++) {
+    for(; i < OBJECTS; i++) {
 		MultiplyMatrix(RotationMatrixAnim, InitialTransform, ModelMatrix[i]);
 		MultiplyMatrix(TranslateDown, ModelMatrix[i], ModelMatrix[i]);
 	}
@@ -232,6 +237,19 @@ void SetupDataBuffers()
     glBindBuffer(GL_ARRAY_BUFFER, CBO[2]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data3), color_buffer_data3, GL_STATIC_DRAW);
    
+
+    glGenBuffers(1, &VBO[3]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data4), vertex_buffer_data4, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &IBO[3]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[3]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data4), index_buffer_data4, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &CBO[3]);
+    glBindBuffer(GL_ARRAY_BUFFER, CBO[3]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data4), color_buffer_data4, GL_STATIC_DRAW);
+
 }
 
 
@@ -361,14 +379,17 @@ void Initialize(void)
     memcpy(vertex_buffer_data1, vertex_octagon, sizeof(vertex_octagon));
     memcpy(vertex_buffer_data2, vertex_pyramid, sizeof(vertex_pyramid));
     memcpy(vertex_buffer_data3, vertex_mainBar, sizeof(vertex_mainBar));
-    
+    memcpy(vertex_buffer_data4, vertex_cube, sizeof(vertex_cube));    
+
     memcpy(color_buffer_data1, color_octagon, sizeof(color_octagon));
     memcpy(color_buffer_data2, color_pyramid, sizeof(color_pyramid));
     memcpy(color_buffer_data3, color_mainBar, sizeof(color_mainBar));
-    
+    memcpy(color_buffer_data4, color_cube, sizeof(color_cube));    
+
     memcpy(index_buffer_data1, index_octagon, sizeof(index_octagon));
     memcpy(index_buffer_data2, index_pyramid, sizeof(index_pyramid));
     memcpy(index_buffer_data3, index_mainBar, sizeof(index_mainBar));
+    memcpy(index_buffer_data4, index_cube, sizeof(index_cube));
 
     /* Setup vertex, color, and index buffer objects */
     SetupDataBuffers();
@@ -380,7 +401,7 @@ void Initialize(void)
     SetIdentityMatrix(ProjectionMatrix);
     SetIdentityMatrix(ViewMatrix);
     int i = 0;
-    for(;i<3;i++) {
+    for(;i<OBJECTS;i++) {
 		SetIdentityMatrix(ModelMatrix[i]);
 	}
 
