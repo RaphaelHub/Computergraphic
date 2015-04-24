@@ -29,19 +29,25 @@
 #include "LoadShader.h"   /* Provides loading function for shader code */
 #include "Matrix.h"  
 #include "Octagon.h"
+#include "GObject.h"
 
+#define M_PI 3.1415
 
 /*----------------------------------------------------------------*/
 
 /* Define handle to a vertex buffer object */
-GLuint VBO;
+//GLuint VBO;
 GLuint cVBO[4]; // cube vertex buffers
 /* Define handle to a color buffer object */
-GLuint CBO; 
+//GLuint CBO; 
 GLuint cCBO[4]; // cube color buffers
 /* Define handle to an index buffer object */
-GLuint IBO;
+//GLuint IBO;
 GLuint cIBO[4]; // cube index buffers
+
+/* Define grafical objects here */
+GObj karusell;
+GObj cube1;
 
 /* Indices to vertex attributes; in this case positon and color */ 
 enum DataID {vPosition = 0, vColor = 1}; 
@@ -270,7 +276,7 @@ GLushort cube_index_buffer[] = {
     // top face
     6,5,4,
     6,7,4
-}
+};
     
 /*----------------------------------------------------------------*/
 
@@ -290,20 +296,24 @@ void Display()
 {
     /* Clear window; color specified in 'Initialize()' */
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    _display(&karusell, vPosition, vColor, ProjectionMatrix, ViewMatrix,
+        ModelMatrix, &ShaderProgram);
 
+/*
     glEnableVertexAttribArray(vPosition);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, karusell.VBO);
     glVertexAttribPointer(vPosition, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glEnableVertexAttribArray(vColor);
-    glBindBuffer(GL_ARRAY_BUFFER, CBO);
+    glBindBuffer(GL_ARRAY_BUFFER, karusell.CBO);
     glVertexAttribPointer(vColor, 3, GL_FLOAT,GL_FALSE, 0, 0);   
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, karusell.IBO);
     GLint size; 
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 
-    /* Associate program with shader matrices */
+    // Associate program with shader matrices
     GLint projectionUniform = glGetUniformLocation(ShaderProgram, "ProjectionMatrix");
     if (projectionUniform == -1) 
     {
@@ -328,13 +338,13 @@ void Display()
     }
    glUniformMatrix4fv(RotationUniform, 1, GL_TRUE, ModelMatrix);  
 
-    /* Issue draw command, using indexed triangle list */
+    // Issue draw command, using indexed triangle list
     glDrawElements(GL_TRIANGLES, size/sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
 
-    /* Disable attributes */
+    // Disable attributes
     glDisableVertexAttribArray(vPosition);
     glDisableVertexAttribArray(vColor);   
-
+*/
     /* Swap between front and back buffer */ 
     glutSwapBuffers();
 }
@@ -375,6 +385,12 @@ void OnIdle()
 
 void SetupDataBuffers()
 {
+    _setupDataBuffers(&karusell, *vertex_buffer_data, *color_buffer_data,
+        *index_buffer_data);
+
+    _setupDataBuffers(&cube1, *cube_vertex_buffer, *cube_color_buffer,
+        *cube_index_buffer);
+/*
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data), vertex_buffer_data, GL_STATIC_DRAW);
@@ -386,7 +402,21 @@ void SetupDataBuffers()
     glGenBuffers(1, &CBO);
     glBindBuffer(GL_ARRAY_BUFFER, CBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data), color_buffer_data, GL_STATIC_DRAW);
+
+    for(int i=0; i < 4; i++) {
+        glGenBuffers(1, &(cVBO[i]));
+        glBindBuffer(GL_ARRAY_BUFFER, cVBO[i]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertex_buffer), cube_vertex_buffer, GL_STATIC_DRAW);
     
+        glGenBuffers(1, &(cIBO[i]));
+        glBindBuffer(GL_ARRAY_BUFFER, cIBO[i]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(cube_index_buffer), cube_index_buffer, GL_STATIC_DRAW);
+        
+        glGenBuffers(1, &(cCBO[i]));
+        glBindBuffer(GL_ARRAY_BUFFER, cCBO[i]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(cube_color_buffer), cube_color_buffer, GL_STATIC_DRAW);
+    }
+*/
 }
 
 

@@ -1,6 +1,6 @@
 CC = gcc
-OBJ =merry-go-round.o LoadShader.o Matrix.o
-CFLAGS = -g -Wall -Wextra
+OBJ =merry-go-round.o LoadShader.o Matrix.o GObject.o
+CFLAGS = -std=c99 -g -Wall -Wextra
 
 LDLIBS=-lm -lglut -lGLEW -lGL
 
