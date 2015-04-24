@@ -96,17 +96,31 @@ GLushort index_buffer_data7[sizeof(index_cube)];
 /*----------------------------------------------------------------*/
 
 void transform(int i, float rot_offset, float rot_speed, float size,
-    float height, float radius) {
+    float height, float radius, int wobble) {
     float angle = (glutGet(GLUT_ELAPSED_TIME) / 1000.0) * (180/M_PI);
     float RotationMatrixAnim[16];
     float ScaleMatrix[16];
     float InitialTransform[16];
+    float scale = 0.01;
+    float maxHeight = height + 0.5;
+    float minHeight = height - 0.5;
+    static int up[OBJECTS];
+    static int time[OBJECTS];
+
+    if(wobble == 1) {
+        if(up[i] == 0)  height = maxHeight - (time[i]++) * scale;
+        else            height = minHeight + (time[i]++) * scale;
+        if(time[i] >= 100) {
+            up[i] = (up[i] == 0) ? 1 : 0;
+            time[i] = 0;
+        }
+    }
 
     SetScaling(size, size, size, ScaleMatrix);
 
     SetRotationY(rot_speed*angle + rot_offset, RotationMatrixAnim);
     SetTranslation(radius, height, 0, InitialTransform);
-
+    
     MultiplyMatrix(InitialTransform, ScaleMatrix, ModelMatrix[i]);
     MultiplyMatrix(RotationMatrixAnim, ModelMatrix[i], ModelMatrix[i]);
 }
@@ -209,15 +223,15 @@ void OnIdle()
 //}
 
     // transform karusell
-    transform(0, 0.0, 0.3, 1.0, -2.5, 0.0);
-    transform(1, 0.0, 0.3, 1.0, -2.5, 0.0);
-    transform(2, 0.0, 0.3, 1.0, -2.5, 0.0);
+    transform(0, 0.0, 0.3, 1.0, -2.5, 0.0, 0);
+    transform(1, 0.0, 0.3, 1.0, -2.5, 0.0, 0);
+    transform(2, 0.0, 0.3, 1.0, -2.5, 0.0, 0);
 
     // transform cube
-    transform(3,   0.0, 0.3, 0.5, -1.0, 2.0);
-    transform(4,  90.0, 0.3, 0.5, -1.0, 2.0);
-    transform(5, 180.0, 0.3, 0.5, -1.0, 2.0);
-    transform(6, 270.0, 0.3, 0.5, -1.0, 2.0);
+    transform(3,   0.0, 0.3, 0.5, -1.0, 2.0, 1);
+    transform(4,  90.0, 0.3, 0.5, -1.0, 2.0, 1);
+    transform(5, 180.0, 0.3, 0.5, -1.0, 2.0, 1);
+    transform(6, 270.0, 0.3, 0.5, -1.0, 2.0, 1);
 
     /* Request redrawing forof window content */  
     glutPostRedisplay();
