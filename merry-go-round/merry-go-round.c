@@ -58,7 +58,7 @@ GLuint ShaderProgram;
 
 float ProjectionMatrix[16]; /* Perspective projection matrix */
 float ViewMatrix[16]; /* Camera view matrix */ 
-float ModelMatrix[3][16]; /* Model matrix */ 
+float ModelMatrix[OBJECTS][16]; /* Model matrix */ 
 
 /* Transformation matrices for initial position */
 float TranslateOrigin[16];
@@ -84,6 +84,22 @@ GLushort index_buffer_data3[sizeof(index_mainBar)];
 GLushort index_buffer_data4[sizeof(index_cube)];
 
 /*----------------------------------------------------------------*/
+
+void transform(int i, float rot_offset, float rot_speed, float size,
+    float height, float radius) {
+    float angle = (glutGet(GLUT_ELAPSED_TIME) / 1000.0) * (180/M_PI);
+    float RotationMatrixAnim[16];
+    float ScaleMatrix[16];
+    float InitialTransform[16];
+
+    SetScale(size, size, size, ScaleMatrix);
+
+    SetRotationY(rot_speed*angle + rot_offset, RotationMatrixAnim);
+    SetTranslation(radius, height, 0, InitialTransform);
+
+    MultiplyMatrix(InitialTranform, ScaleMatrix, ModelMatrix[i]);
+    MultiplyMatrix(RotationMatrixAnim, ModelMatrix[i], ModelMatrix[i]);
+}
 
 void DisplayOneObject(int i) {
     glEnableVertexAttribArray(vPosition);
