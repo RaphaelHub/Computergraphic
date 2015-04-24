@@ -14,9 +14,6 @@
 *
 *******************************************************************/
 
-/* for Windows*/
-#define GLEW_STATIC
-
 /* Standard includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,6 +30,7 @@
 #include "Matrix.h"  
 #include "Octagon.h"
 #include "Pyramid.h"
+#include "mainBar.h"
 
 
 /*----------------------------------------------------------------*/
@@ -70,16 +68,15 @@ float InitialTransform[16];
 
 GLfloat vertex_buffer_data1[sizeof(vertex_octagon)]; 
 GLfloat vertex_buffer_data2[sizeof(vertex_pyramid)];  
-GLfloat vertex_buffer_data3[sizeof(vertex_octagon)]; 
+GLfloat vertex_buffer_data3[sizeof(vertex_mainBar)]; 
 
 GLfloat color_buffer_data1[sizeof(color_octagon)];
 GLfloat color_buffer_data2[sizeof(color_pyramid)];
-GLfloat color_buffer_data3[sizeof(color_octagon)];
-
+GLfloat color_buffer_data3[sizeof(color_mainBar)];
 
 GLushort index_buffer_data1[sizeof(index_octagon)];
 GLushort index_buffer_data2[sizeof(index_pyramid)];
-GLushort index_buffer_data3[sizeof(index_octagon)];
+GLushort index_buffer_data3[sizeof(index_mainBar)];
     
 /*----------------------------------------------------------------*/
 
@@ -146,12 +143,12 @@ void DisplayOneObject(int i) {
 void Display()
 {
     	/* Clear window; color specified in 'Initialize()' */
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
-	int i = 0;
-	for(;i < 3; i++) {
+	int i = 0;  
+	for(;i < 3; i++) { 
 		DisplayOneObject(i);
-	}
+	}  
     /* Swap between front and back buffer */ 
     glutSwapBuffers();
 }
@@ -172,13 +169,6 @@ void OnIdle()
 
     /* Time dependent rotation */
     SetRotationY(angle, RotationMatrixAnim);
-    
-    /* scale and translate matrix 3 */
-    float TempTranslate[16];
-    SetTranslation(0, 0.5,0, TempTranslate);
-    MultiplyMatrix(ModelMatrix[2], TempTranslate, ModelMatrix[2]);
-    SetScaling(0.1, 4.0, 0.1,TempTranslate);
-    MultiplyMatrix(ModelMatrix[2], TempTranslate, ModelMatrix[2]);
 
     /* Apply model rotation; finally move cube down */
     int i = 0;
@@ -370,15 +360,15 @@ void Initialize(void)
     /*copy objects into buffer*/
     memcpy(vertex_buffer_data1, vertex_octagon, sizeof(vertex_octagon));
     memcpy(vertex_buffer_data2, vertex_pyramid, sizeof(vertex_pyramid));
-    memcpy(vertex_buffer_data3, vertex_octagon, sizeof(vertex_octagon));
+    memcpy(vertex_buffer_data3, vertex_mainBar, sizeof(vertex_mainBar));
     
     memcpy(color_buffer_data1, color_octagon, sizeof(color_octagon));
     memcpy(color_buffer_data2, color_pyramid, sizeof(color_pyramid));
-    memcpy(color_buffer_data3, color_octagon, sizeof(color_octagon));
+    memcpy(color_buffer_data3, color_mainBar, sizeof(color_mainBar));
     
     memcpy(index_buffer_data1, index_octagon, sizeof(index_octagon));
     memcpy(index_buffer_data2, index_pyramid, sizeof(index_pyramid));
-    memcpy(index_buffer_data3, index_octagon, sizeof(index_octagon));
+    memcpy(index_buffer_data3, index_mainBar, sizeof(index_mainBar));
 
     /* Setup vertex, color, and index buffer objects */
     SetupDataBuffers();
