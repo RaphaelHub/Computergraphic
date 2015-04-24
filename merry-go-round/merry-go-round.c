@@ -35,7 +35,7 @@
 
 /*----------------------------------------------------------------*/
 
-#define OBJECTS 4
+#define OBJECTS 7
 
 /* Define handle to a vertex buffer object */
 GLuint VBO[OBJECTS];
@@ -72,16 +72,26 @@ GLfloat vertex_buffer_data1[sizeof(vertex_octagon)];
 GLfloat vertex_buffer_data2[sizeof(vertex_pyramid)];  
 GLfloat vertex_buffer_data3[sizeof(vertex_mainBar)]; 
 GLfloat vertex_buffer_data4[sizeof(vertex_cube)];
+GLfloat vertex_buffer_data5[sizeof(vertex_cube)];
+GLfloat vertex_buffer_data6[sizeof(vertex_cube)];
+GLfloat vertex_buffer_data7[sizeof(vertex_cube)];
 
 GLfloat color_buffer_data1[sizeof(color_octagon)];
 GLfloat color_buffer_data2[sizeof(color_pyramid)];
 GLfloat color_buffer_data3[sizeof(color_mainBar)];
 GLfloat color_buffer_data4[sizeof(color_cube)];
+GLfloat color_buffer_data5[sizeof(color_cube)];
+GLfloat color_buffer_data6[sizeof(color_cube)];
+GLfloat color_buffer_data7[sizeof(color_cube)];
 
 GLushort index_buffer_data1[sizeof(index_octagon)];
 GLushort index_buffer_data2[sizeof(index_pyramid)];
 GLushort index_buffer_data3[sizeof(index_mainBar)];
 GLushort index_buffer_data4[sizeof(index_cube)];
+GLushort index_buffer_data5[sizeof(index_cube)];
+GLushort index_buffer_data6[sizeof(index_cube)];
+GLushort index_buffer_data7[sizeof(index_cube)];
+
 
 /*----------------------------------------------------------------*/
 
@@ -92,12 +102,12 @@ void transform(int i, float rot_offset, float rot_speed, float size,
     float ScaleMatrix[16];
     float InitialTransform[16];
 
-    SetScale(size, size, size, ScaleMatrix);
+    SetScaling(size, size, size, ScaleMatrix);
 
     SetRotationY(rot_speed*angle + rot_offset, RotationMatrixAnim);
     SetTranslation(radius, height, 0, InitialTransform);
 
-    MultiplyMatrix(InitialTranform, ScaleMatrix, ModelMatrix[i]);
+    MultiplyMatrix(InitialTransform, ScaleMatrix, ModelMatrix[i]);
     MultiplyMatrix(RotationMatrixAnim, ModelMatrix[i], ModelMatrix[i]);
 }
 
@@ -185,18 +195,29 @@ void Display()
 
 void OnIdle()
 {
-    float angle = (glutGet(GLUT_ELAPSED_TIME) / 1000.0) * (180.0/M_PI); 
-    float RotationMatrixAnim[16];
+    //float angle = (glutGet(GLUT_ELAPSED_TIME) / 1000.0) * (180.0/M_PI); 
+    //float RotationMatrixAnim[16];
 
     /* Time dependent rotation */
-    SetRotationY(angle, RotationMatrixAnim);
+    //SetRotationY(angle, RotationMatrixAnim);
 
     /* Apply model rotation; finally move cube down */
-    int i = 0;
-    for(; i < OBJECTS; i++) {
-		MultiplyMatrix(RotationMatrixAnim, InitialTransform, ModelMatrix[i]);
-		MultiplyMatrix(TranslateDown, ModelMatrix[i], ModelMatrix[i]);
-	}
+    //int i = 0;
+    //for(; i < OBJECTS; i++) {
+	//	MultiplyMatrix(RotationMatrixAnim, InitialTransform, ModelMatrix[i]);
+	//	MultiplyMatrix(TranslateDown, ModelMatrix[i], ModelMatrix[i]);
+//}
+
+    // transform karusell
+    transform(0, 0.0, 0.3, 1.0, -2.5, 0.0);
+    transform(1, 0.0, 0.3, 1.0, -2.5, 0.0);
+    transform(2, 0.0, 0.3, 1.0, -2.5, 0.0);
+
+    // transform cube
+    transform(3,   0.0, 0.3, 0.5, -1.0, 2.0);
+    transform(4,  90.0, 0.3, 0.5, -1.0, 2.0);
+    transform(5, 180.0, 0.3, 0.5, -1.0, 2.0);
+    transform(6, 270.0, 0.3, 0.5, -1.0, 2.0);
 
     /* Request redrawing forof window content */  
     glutPostRedisplay();
@@ -213,6 +234,7 @@ void OnIdle()
 
 void SetupDataBuffers()
 {
+    // ground plane
     glGenBuffers(1, &VBO[0]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data1), vertex_buffer_data1, GL_STATIC_DRAW);
@@ -225,9 +247,8 @@ void SetupDataBuffers()
     glBindBuffer(GL_ARRAY_BUFFER, CBO[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data1), color_buffer_data1, GL_STATIC_DRAW);
     
-    
-    
-      glGenBuffers(1, &VBO[1]);
+    // stange
+    glGenBuffers(1, &VBO[1]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data2), vertex_buffer_data2, GL_STATIC_DRAW);
 
@@ -238,10 +259,9 @@ void SetupDataBuffers()
     glGenBuffers(1, &CBO[1]);
     glBindBuffer(GL_ARRAY_BUFFER, CBO[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data2), color_buffer_data2, GL_STATIC_DRAW);
-    
-    
-    
-      glGenBuffers(1, &VBO[2]);
+        
+    // kopf
+    glGenBuffers(1, &VBO[2]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data3), vertex_buffer_data3, GL_STATIC_DRAW);
 
@@ -253,7 +273,7 @@ void SetupDataBuffers()
     glBindBuffer(GL_ARRAY_BUFFER, CBO[2]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data3), color_buffer_data3, GL_STATIC_DRAW);
    
-
+    // cube 1
     glGenBuffers(1, &VBO[3]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data4), vertex_buffer_data4, GL_STATIC_DRAW);
@@ -265,6 +285,45 @@ void SetupDataBuffers()
     glGenBuffers(1, &CBO[3]);
     glBindBuffer(GL_ARRAY_BUFFER, CBO[3]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data4), color_buffer_data4, GL_STATIC_DRAW);
+
+    // cube 2
+    glGenBuffers(1, &VBO[4]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[4]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data5), vertex_buffer_data5, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &IBO[4]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[4]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data5), index_buffer_data5, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &CBO[4]);
+    glBindBuffer(GL_ARRAY_BUFFER, CBO[4]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data5), color_buffer_data5, GL_STATIC_DRAW);
+
+    // cube 3
+    glGenBuffers(1, &VBO[5]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[5]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data6), vertex_buffer_data6, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &IBO[5]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[5]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data6), index_buffer_data6, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &CBO[5]);
+    glBindBuffer(GL_ARRAY_BUFFER, CBO[5]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data6), color_buffer_data6, GL_STATIC_DRAW);
+
+    // cube 4
+    glGenBuffers(1, &VBO[6]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[6]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data7), vertex_buffer_data7, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &IBO[6]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[6]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data7), index_buffer_data7, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &CBO[6]);
+    glBindBuffer(GL_ARRAY_BUFFER, CBO[6]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data7), color_buffer_data7, GL_STATIC_DRAW);
 
 }
 
@@ -396,16 +455,25 @@ void Initialize(void)
     memcpy(vertex_buffer_data2, vertex_pyramid, sizeof(vertex_pyramid));
     memcpy(vertex_buffer_data3, vertex_mainBar, sizeof(vertex_mainBar));
     memcpy(vertex_buffer_data4, vertex_cube, sizeof(vertex_cube));    
+    memcpy(vertex_buffer_data5, vertex_cube, sizeof(vertex_cube));
+    memcpy(vertex_buffer_data6, vertex_cube, sizeof(vertex_cube));
+    memcpy(vertex_buffer_data7, vertex_cube, sizeof(vertex_cube));
 
     memcpy(color_buffer_data1, color_octagon, sizeof(color_octagon));
     memcpy(color_buffer_data2, color_pyramid, sizeof(color_pyramid));
     memcpy(color_buffer_data3, color_mainBar, sizeof(color_mainBar));
     memcpy(color_buffer_data4, color_cube, sizeof(color_cube));    
+    memcpy(color_buffer_data5, color_cube, sizeof(color_cube));
+    memcpy(color_buffer_data6, color_cube, sizeof(color_cube));
+    memcpy(color_buffer_data7, color_cube, sizeof(color_cube));
 
     memcpy(index_buffer_data1, index_octagon, sizeof(index_octagon));
     memcpy(index_buffer_data2, index_pyramid, sizeof(index_pyramid));
     memcpy(index_buffer_data3, index_mainBar, sizeof(index_mainBar));
     memcpy(index_buffer_data4, index_cube, sizeof(index_cube));
+    memcpy(index_buffer_data5, index_cube, sizeof(index_cube));
+    memcpy(index_buffer_data6, index_cube, sizeof(index_cube));
+    memcpy(index_buffer_data7, index_cube, sizeof(index_cube));
 
     /* Setup vertex, color, and index buffer objects */
     SetupDataBuffers();
