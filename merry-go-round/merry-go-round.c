@@ -14,6 +14,9 @@
 *
 *******************************************************************/
 
+/* for Windows */
+//#define GLEW_STATIC
+
 /* Standard includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -66,6 +69,10 @@ float TranslateDown[16];
 float RotateX[16];
 float RotateZ[16];
 float InitialTransform[16];
+
+/* For mouse input */
+int mouse_x;
+int mouse_y;
 
 
 GLfloat vertex_buffer_data1[sizeof(vertex_octagon)]; 
@@ -443,6 +450,93 @@ void CreateShaderProgram()
     glUseProgram(ShaderProgram);
 }
 
+void keyboard1(unsigned char key, int x, int y) {
+
+	switch(key) {
+		
+	/*	case 'a' : //moving left
+		case 'd' : //moving right
+		case ' ' : //camera stop - move
+		case '1' : //set speed to 1
+		case '2' : //set speed to 2
+		case '3' : //set speed to 3
+		*/
+	}
+	
+	
+	
+}
+
+void keyboard2(unsigned char key, int x, int y) {
+	float rotation[16];
+	float translation[16];
+    float camera_disp = -10.0;
+    
+    if ( key == 'w' || key == 'a' || key == 's' || key == 'd' || key == ' ') {
+		SetTranslation(0.0, 0.0, camera_disp, translation);
+		MultiplyMatrix(translation, ViewMatrix, ViewMatrix);
+	} else {
+		return;
+	}
+	
+	switch(key) {
+		case 'w' : SetRotationX(5, rotation); 	
+			break;
+		case 'a' : SetRotationY(5, rotation);
+			break;
+		case 's' : SetRotationX(-5, rotation);
+			break;
+		case 'd' : SetRotationY(-5, rotation);
+			break;	
+		case ' ' : SetTranslation(0.0, 0.0, camera_disp, ViewMatrix);
+			return;	
+		default : return;			
+	}
+	MultiplyMatrix(ViewMatrix, rotation, ViewMatrix);
+	SetTranslation(0.0, 0.0,camera_disp * -1, translation);
+	MultiplyMatrix(translation, ViewMatrix, ViewMatrix); 
+}
+
+void mouse(int button, int state, int x, int y){
+	
+	float rotation[16];
+	float translation[16];
+    float camera_disp = -10.0;
+	if(button != 0) {return;} 
+	
+	/* mouse click*/
+	if (state == 0) {
+		mouse_x = x;
+		mouse_y = y;
+		return;
+	/* mouse release*/	
+	} else if ( state == 1) { 
+		SetTranslation(0.0, 0.0, camera_disp, translation);
+		MultiplyMatrix(translation, ViewMatrix, ViewMatrix);
+		
+		int diffX = mouse_x - x;
+		int diffY = mouse_y - y;
+		
+		/* right to left or reverse*/
+		if (fabs(diffX) > fabs(diffY)) {
+			if(diffX < 0) {
+				SetRotationY(-5, rotation);
+			} else {
+				SetRotationY(5, rotation);
+			}
+		} else {
+			if (diffY < 0) {
+				SetRotationX(-5, rotation);
+			} else {
+				 SetRotationX(5, rotation);
+			 }
+		}
+	}
+	MultiplyMatrix(ViewMatrix, rotation, ViewMatrix);
+	SetTranslation(0.0, 0.0,camera_disp * -1, translation);
+	MultiplyMatrix(translation, ViewMatrix, ViewMatrix); 
+}
+
 
 /******************************************************************
 *
@@ -514,7 +608,7 @@ void Initialize(void)
     float camera_disp = -10.0;
     SetTranslation(0.0, 0.0, camera_disp, ViewMatrix);
 
-    /* Translate and rotate cube onto tip */
+    /* Translate and rotate cube */
     SetTranslation(0, 0, 0, TranslateOrigin);
     SetRotationX(0.0, RotateX);
     SetRotationZ(0.0, RotateZ);	
@@ -525,6 +619,9 @@ void Initialize(void)
     /* Initial transformation matrix */
     MultiplyMatrix(RotateX, TranslateOrigin, InitialTransform);
     MultiplyMatrix(RotateZ, InitialTransform, InitialTransform);
+    
+   	
+    
 }
 
 
@@ -562,6 +659,21 @@ int main(int argc, char** argv)
      * handing control over to GLUT */
     glutIdleFunc(OnIdle);
     glutDisplayFunc(Display);
+    
+    int mode = 0;
+    printf("choose your camera mode (1,2)\n");
+    scanf("%d", &mode);
+    
+    if (mode == 1) {
+		printf("**********Mode 1**********\nControlling:\nd: moving right\na: moving left\nspace: pause\n1,2,3: speed\n");
+		glutKeyboardFunc(keyboard1);
+	} else if (mode == 2) {
+		printf("**********Mode 2**********\nControlling:\nd: right\na: left\nw: up\ns: down\nspace: back to center\nmouse left-click and hold to direction\n");
+		glutKeyboardFunc(keyboard2);
+		glutMouseFunc(mouse);
+	} else {
+		return 0;
+	}
     glutMainLoop();
 
     /* ISO C requires main to return int */
