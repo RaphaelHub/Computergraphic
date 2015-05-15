@@ -15,7 +15,7 @@
 *******************************************************************/
 
 /* for Windows */
-//#define GLEW_STATIC
+#define GLEW_STATIC
 
 /* Standard includes */
 #include <stdio.h>
@@ -31,6 +31,7 @@
 /* Local includes */
 #include "LoadShader.h"   /* Provides loading function for shader code */
 #include "Matrix.h"  
+#include "OBJParser.h" 
 #include "Octagon.h"
 #include "Pyramid.h"
 #include "mainBar.h"
@@ -74,30 +75,31 @@ float InitialTransform[16];
 int mouse_x;
 int mouse_y;
 
+/* Structures for loading of OBJ data */
+obj_scene_data data7, data6;
+
 
 GLfloat vertex_buffer_data1[sizeof(vertex_octagon)]; 
 GLfloat vertex_buffer_data2[sizeof(vertex_pyramid)];  
 GLfloat vertex_buffer_data3[sizeof(vertex_mainBar)]; 
 GLfloat vertex_buffer_data4[sizeof(vertex_cube)];
 GLfloat vertex_buffer_data5[sizeof(vertex_cube)];
-GLfloat vertex_buffer_data6[sizeof(vertex_cube)];
-GLfloat vertex_buffer_data7[sizeof(vertex_cube)];
+GLfloat *vertex_buffer_data6;
+GLfloat *vertex_buffer_data7;
 
 GLfloat color_buffer_data1[sizeof(color_octagon)];
 GLfloat color_buffer_data2[sizeof(color_pyramid)];
 GLfloat color_buffer_data3[sizeof(color_mainBar)];
 GLfloat color_buffer_data4[sizeof(color_cube)];
 GLfloat color_buffer_data5[sizeof(color_cube)];
-GLfloat color_buffer_data6[sizeof(color_cube)];
-GLfloat color_buffer_data7[sizeof(color_cube)];
 
 GLushort index_buffer_data1[sizeof(index_octagon)];
 GLushort index_buffer_data2[sizeof(index_pyramid)];
 GLushort index_buffer_data3[sizeof(index_mainBar)];
 GLushort index_buffer_data4[sizeof(index_cube)];
 GLushort index_buffer_data5[sizeof(index_cube)];
-GLushort index_buffer_data6[sizeof(index_cube)];
-GLushort index_buffer_data7[sizeof(index_cube)];
+GLushort *index_buffer_data6;
+GLushort *index_buffer_data7;
 
 
 /*----------------------------------------------------------------*/
@@ -329,9 +331,7 @@ void SetupDataBuffers()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[5]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data6), index_buffer_data6, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &CBO[5]);
-    glBindBuffer(GL_ARRAY_BUFFER, CBO[5]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data6), color_buffer_data6, GL_STATIC_DRAW);
+
 
     // cube 4
     glGenBuffers(1, &VBO[6]);
@@ -342,9 +342,7 @@ void SetupDataBuffers()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[6]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data7), index_buffer_data7, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &CBO[6]);
-    glBindBuffer(GL_ARRAY_BUFFER, CBO[6]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data7), color_buffer_data7, GL_STATIC_DRAW);
+
 
 }
 
@@ -556,32 +554,92 @@ void Initialize(void)
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);    
     
-    /* Transform matrix for the bar in the middle*/
+     /* Load first OBJ model */
+     int success;
+     int i = 0;
+    char* filename1 = "models/teapot.obj"; 
+    success = parse_obj_scene(&data6, filename1);
+
+    if(!success)
+        printf("Could not load file. Exiting.\n");
+
+    /* Load second OBJ model */
+    char* filename2 = "models/suzanne.obj";
+    success = parse_obj_scene(&data7, filename2);
+    
+    if(!success)
+        printf("Could not load file. Exiting.\n");
+
+     /*  Copy mesh data from structs into appropriate arrays */ 
+    int vert = data6.vertex_count;
+    int indx = data6.face_count;
+
+    vertex_buffer_data6 = (GLfloat*) calloc (vert*3, sizeof(GLfloat));
+    index_buffer_data6 = (GLushort*) calloc (indx*3, sizeof(GLushort));
+  
+    /* Vertices */
+    for(i=0; i<vert; i++)
+    {
+        vertex_buffer_data6[i*3] = (GLfloat)(*data6.vertex_list[i]).e[0];
+	vertex_buffer_data6[i*3+1] = (GLfloat)(*data6.vertex_list[i]).e[1];
+	vertex_buffer_data6[i*3+2] = (GLfloat)(*data6.vertex_list[i]).e[2];
+    }
+
+    /* Indices */
+    for(i=0; i<indx; i++)
+    {
+	index_buffer_data6[i*3] = (GLushort)(*data6.face_list[i]).vertex_index[0];
+	index_buffer_data6[i*3+1] = (GLushort)(*data6.face_list[i]).vertex_index[1];
+	index_buffer_data6[i*3+2] = (GLushort)(*data6.face_list[i]).vertex_index[2];
+    }
+
+    vert = data7.vertex_count;
+    indx = data7.face_count;
+
+    vertex_buffer_data7 = (GLfloat*) calloc (vert*3, sizeof(GLfloat));
+    index_buffer_data7 = (GLushort*) calloc (indx*3, sizeof(GLushort));
+ 
+    /* Vertices */
+    for(i=0; i<vert; i++)
+    {
+	vertex_buffer_data7[i*3] = (GLfloat)(*data7.vertex_list[i]).e[0];
+	vertex_buffer_data7[i*3+1] = (GLfloat)(*data7.vertex_list[i]).e[1];
+	vertex_buffer_data7[i*3+2] = (GLfloat)(*data7.vertex_list[i]).e[2];
+    }
+
+    /* Indices */
+    for(i=0; i<indx; i++)
+    {
+	index_buffer_data7[i*3] = (GLushort)(*data7.face_list[i]).vertex_index[0];
+	index_buffer_data7[i*3+1] = (GLushort)(*data7.face_list[i]).vertex_index[1];
+	index_buffer_data7[i*3+2] = (GLushort)(*data7.face_list[i]).vertex_index[2];
+    }
+
     
     /*copy objects into buffer*/
     memcpy(vertex_buffer_data1, vertex_octagon, sizeof(vertex_octagon));
     memcpy(vertex_buffer_data2, vertex_pyramid, sizeof(vertex_pyramid));
     memcpy(vertex_buffer_data3, vertex_mainBar, sizeof(vertex_mainBar));
+    
     memcpy(vertex_buffer_data4, vertex_cube, sizeof(vertex_cube));    
     memcpy(vertex_buffer_data5, vertex_cube, sizeof(vertex_cube));
-    memcpy(vertex_buffer_data6, vertex_cube, sizeof(vertex_cube));
-    memcpy(vertex_buffer_data7, vertex_cube, sizeof(vertex_cube));
+
 
     memcpy(color_buffer_data1, color_octagon, sizeof(color_octagon));
     memcpy(color_buffer_data2, color_pyramid, sizeof(color_pyramid));
     memcpy(color_buffer_data3, color_mainBar, sizeof(color_mainBar));
+    
     memcpy(color_buffer_data4, color_cube, sizeof(color_cube));    
     memcpy(color_buffer_data5, color_cube, sizeof(color_cube));
-    memcpy(color_buffer_data6, color_cube, sizeof(color_cube));
-    memcpy(color_buffer_data7, color_cube, sizeof(color_cube));
+
 
     memcpy(index_buffer_data1, index_octagon, sizeof(index_octagon));
     memcpy(index_buffer_data2, index_pyramid, sizeof(index_pyramid));
     memcpy(index_buffer_data3, index_mainBar, sizeof(index_mainBar));
+    
     memcpy(index_buffer_data4, index_cube, sizeof(index_cube));
     memcpy(index_buffer_data5, index_cube, sizeof(index_cube));
-    memcpy(index_buffer_data6, index_cube, sizeof(index_cube));
-    memcpy(index_buffer_data7, index_cube, sizeof(index_cube));
+
 
     /* Setup vertex, color, and index buffer objects */
     SetupDataBuffers();
@@ -592,7 +650,7 @@ void Initialize(void)
     /* Initialize matrices */
     SetIdentityMatrix(ProjectionMatrix);
     SetIdentityMatrix(ViewMatrix);
-    int i = 0;
+    i = 0;
     for(;i<OBJECTS;i++) {
 		SetIdentityMatrix(ModelMatrix[i]);
 	}
@@ -620,7 +678,7 @@ void Initialize(void)
     MultiplyMatrix(RotateX, TranslateOrigin, InitialTransform);
     MultiplyMatrix(RotateZ, InitialTransform, InitialTransform);
     
-   	
+	
     
 }
 
