@@ -36,6 +36,8 @@
 #include "mainBar.h"
 #include "cube.h"
 
+#include "object.h"
+
 /*----------------------------------------------------------------*/
 
 #define OBJECTS 7
@@ -74,6 +76,7 @@ float InitialTransform[16];
 int mouse_x;
 int mouse_y;
 
+GObject *octagon;
 
 GLfloat vertex_buffer_data1[sizeof(vertex_octagon)]; 
 GLfloat vertex_buffer_data2[sizeof(vertex_pyramid)];  
@@ -256,17 +259,18 @@ void OnIdle()
 void SetupDataBuffers()
 {
     // ground plane
+    printf("register data\n");
     glGenBuffers(1, &VBO[0]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data1), vertex_buffer_data1, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(octagon->vertex), octagon->vertex, GL_STATIC_DRAW);
 
     glGenBuffers(1, &IBO[0]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[0]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data1), index_buffer_data1, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(octagon->index), octagon->index, GL_STATIC_DRAW);
 
     glGenBuffers(1, &CBO[0]);
     glBindBuffer(GL_ARRAY_BUFFER, CBO[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data1), color_buffer_data1, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(octagon->color), octagon->color, GL_STATIC_DRAW);
     
     // stange
     glGenBuffers(1, &VBO[1]);
@@ -559,7 +563,10 @@ void Initialize(void)
     /* Transform matrix for the bar in the middle*/
     
     /*copy objects into buffer*/
-    memcpy(vertex_buffer_data1, vertex_octagon, sizeof(vertex_octagon));
+    printf("add object\n");
+    *octagon = init(vertex_octagon, color_octagon, index_octagon);
+    printf("added object\n");
+    //memcpy(vertex_buffer_data1, vertex_octagon, sizeof(vertex_octagon));
     memcpy(vertex_buffer_data2, vertex_pyramid, sizeof(vertex_pyramid));
     memcpy(vertex_buffer_data3, vertex_mainBar, sizeof(vertex_mainBar));
     memcpy(vertex_buffer_data4, vertex_cube, sizeof(vertex_cube));    
@@ -567,7 +574,7 @@ void Initialize(void)
     memcpy(vertex_buffer_data6, vertex_cube, sizeof(vertex_cube));
     memcpy(vertex_buffer_data7, vertex_cube, sizeof(vertex_cube));
 
-    memcpy(color_buffer_data1, color_octagon, sizeof(color_octagon));
+    //memcpy(color_buffer_data1, color_octagon, sizeof(color_octagon));
     memcpy(color_buffer_data2, color_pyramid, sizeof(color_pyramid));
     memcpy(color_buffer_data3, color_mainBar, sizeof(color_mainBar));
     memcpy(color_buffer_data4, color_cube, sizeof(color_cube));    
@@ -575,7 +582,7 @@ void Initialize(void)
     memcpy(color_buffer_data6, color_cube, sizeof(color_cube));
     memcpy(color_buffer_data7, color_cube, sizeof(color_cube));
 
-    memcpy(index_buffer_data1, index_octagon, sizeof(index_octagon));
+    //memcpy(index_buffer_data1, index_octagon, sizeof(index_octagon));
     memcpy(index_buffer_data2, index_pyramid, sizeof(index_pyramid));
     memcpy(index_buffer_data3, index_mainBar, sizeof(index_mainBar));
     memcpy(index_buffer_data4, index_cube, sizeof(index_cube));
