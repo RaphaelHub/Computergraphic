@@ -636,6 +636,10 @@ void Initialize(void)
 
 int main(int argc, char** argv)
 {
+    int mode = 0;
+    printf("choose your camera mode (1,2)\n");
+    scanf("%d", &mode);
+    
     /* Initialize GLUT; set double buffered window and RGBA color model */
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
@@ -654,26 +658,22 @@ int main(int argc, char** argv)
     /* Setup scene and rendering parameters */
     Initialize();
 
-
     /* Specify callback functions;enter GLUT event processing loop, 
      * handing control over to GLUT */
     glutIdleFunc(OnIdle);
     glutDisplayFunc(Display);
     
-    int mode = 0;
-    printf("choose your camera mode (1,2)\n");
-    scanf("%d", &mode);
-    
     if (mode == 1) {
-		printf("**********Mode 1**********\nControlling:\nd: moving right\na: moving left\nspace: pause\n1,2,3: speed\n");
-		glutKeyboardFunc(keyboard1);
-	} else if (mode == 2) {
-		printf("**********Mode 2**********\nControlling:\nd: right\na: left\nw: up\ns: down\nspace: back to center\nmouse left-click and hold to direction\n");
-		glutKeyboardFunc(keyboard2);
-		glutMouseFunc(mouse);
-	} else {
-		return 0;
-	}
+	printf("**********Mode 1**********\nControlling:\nd: moving right\na: moving left\nspace: pause\n1,2,3: speed\n");
+	glutKeyboardFunc(keyboard1);
+    } else if (mode == 2) {
+	printf("**********Mode 2**********\nControlling:\nd: right\na: left\nw: up\ns: down\nspace: back to center\nmouse left-click and hold to direction\n");
+	glutKeyboardFunc(keyboard2);
+	glutMouseFunc(mouse);
+    } else {
+	return 0;
+    }
+    
     glutMainLoop();
 
     /* ISO C requires main to return int */
