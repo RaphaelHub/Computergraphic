@@ -8,3 +8,4 @@ merry-go-around
 
 # ignore vim swap files
 *.swp
+*~*

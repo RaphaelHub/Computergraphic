@@ -110,7 +110,7 @@ void transform(int i, float rot_offset, float rot_speed, float size,
     float RotationMatrixAnim[16];
     float ScaleMatrix[16];
     float InitialTransform[16];
-    float scale = 0.01;
+    float scale = 0.001;
     float maxHeight = height + 0.5;
     float minHeight = height - 0.5;
     static int up[OBJECTS];
@@ -119,7 +119,7 @@ void transform(int i, float rot_offset, float rot_speed, float size,
     if(wobble == 1) {
         if(up[i] == 0)  height = maxHeight - (time[i]++) * scale;
         else            height = minHeight + (time[i]++) * scale;
-        if(time[i] >= 100) {
+        if(time[i] >= 1000) {
             up[i] = (up[i] == 0) ? 1 : 0;
             time[i] = 0;
         }
@@ -218,18 +218,18 @@ void Display()
 
 void OnIdle()
 {
-    //float angle = (glutGet(GLUT_ELAPSED_TIME) / 1000.0) * (180.0/M_PI); 
-    //float RotationMatrixAnim[16];
+    float angle = (glutGet(GLUT_ELAPSED_TIME) / 1000.0) * (180.0/M_PI); 
+    float RotationMatrixAnim[16];
 
     /* Time dependent rotation */
-    //SetRotationY(angle, RotationMatrixAnim);
+    SetRotationY(angle, RotationMatrixAnim);
 
     /* Apply model rotation; finally move cube down */
-    //int i = 0;
-    //for(; i < OBJECTS; i++) {
-	//	MultiplyMatrix(RotationMatrixAnim, InitialTransform, ModelMatrix[i]);
-	//	MultiplyMatrix(TranslateDown, ModelMatrix[i], ModelMatrix[i]);
-//}
+    int i = 0;
+    for(; i < OBJECTS; i++) {
+	MultiplyMatrix(RotationMatrixAnim, InitialTransform, ModelMatrix[i]);
+	MultiplyMatrix(TranslateDown, ModelMatrix[i], ModelMatrix[i]);
+    }
 
     // transform karusell
     transform(0, 0.0, 0.3, 1.0, -2.5, 0.0, 0);
@@ -325,22 +325,22 @@ void SetupDataBuffers()
     // cube 3
     glGenBuffers(1, &VBO[5]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[5]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data6), vertex_buffer_data6, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, data6.vertex_count*3*sizeof(GLfloat), vertex_buffer_data6, GL_STATIC_DRAW);
 
     glGenBuffers(1, &IBO[5]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[5]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data6), index_buffer_data6, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data6.face_count*3*sizeof(GLushort), index_buffer_data6, GL_STATIC_DRAW);
 
 
 
     // cube 4
     glGenBuffers(1, &VBO[6]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[6]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data7), vertex_buffer_data7, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, data7.vertex_count*3*sizeof(GLfloat), vertex_buffer_data7, GL_STATIC_DRAW);
 
     glGenBuffers(1, &IBO[6]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[6]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data7), index_buffer_data7, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data7.vertex_count*3*sizeof(GLushort), index_buffer_data7, GL_STATIC_DRAW);
 
 
 
@@ -694,6 +694,10 @@ void Initialize(void)
 
 int main(int argc, char** argv)
 {
+    int mode = 0;
+    printf("choose your camera mode (1,2)\n");
+    scanf("%d", &mode);
+  
     /* Initialize GLUT; set double buffered window and RGBA color model */
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
@@ -712,15 +716,11 @@ int main(int argc, char** argv)
     /* Setup scene and rendering parameters */
     Initialize();
 
-
     /* Specify callback functions;enter GLUT event processing loop, 
      * handing control over to GLUT */
     glutIdleFunc(OnIdle);
     glutDisplayFunc(Display);
     
-    int mode = 0;
-    printf("choose your camera mode (1,2)\n");
-    scanf("%d", &mode);
     
     if (mode == 1) {
 		printf("**********Mode 1**********\nControlling:\nd: moving right\na: moving left\nspace: pause\n1,2,3: speed\n");
