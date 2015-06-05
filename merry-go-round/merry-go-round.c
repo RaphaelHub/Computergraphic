@@ -352,6 +352,7 @@ void SetupDataBuffers()
 }
 
 
+
 /******************************************************************
 *
 * AddShader
@@ -552,7 +553,7 @@ void mouse(int button, int state, int x, int y){
 
 void Initialize(void)
 {   
-      /* Set background (clear) color to dark blue */ 
+    /* Set background (clear) color to dark blue */ 
     glClearColor(0.0, 0.0, 0.4, 0.0);
 
     /* Enable depth testing */
@@ -595,7 +596,7 @@ void Initialize(void)
     /* Initialize matrices */
     SetIdentityMatrix(ProjectionMatrix);
     SetIdentityMatrix(ViewMatrix);
-   int i = 0;
+    int i = 0;
     for(;i<OBJECTS;i++) {
 		SetIdentityMatrix(ModelMatrix[i]);
 	}
@@ -604,35 +605,10 @@ void Initialize(void)
 
 	/* Add lighting source to the code */
 	
-//	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_LIGHT0); // adds first light-source to the scene
-	
-	 // Light model parameters:
-     // -------------------------------------------
-     
-     GLfloat lmKa[] = {0.0, 0.0, 0.0, 0.0 };
-     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmKa);
-     
-     glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, 1.0);
-     glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, 0.0);
-     
-	GLfloat spot_direction[] = {1.0, -1.0, -1.0 };
-     GLint spot_exponent = 30;
-     GLint spot_cutoff = 180;
-     
-     glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction);
-     glLighti(GL_LIGHT0, GL_SPOT_EXPONENT, spot_exponent);
-     glLighti(GL_LIGHT0, GL_SPOT_CUTOFF, spot_cutoff);
-    
-     GLfloat Kc = 1.0;
-     GLfloat Kl = 0.0;
-     GLfloat Kq = 0.0;
-     
-     glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION,Kc);
-     glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, Kl);
-     glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, Kq);
 
 	GLfloat ambientLight[] = {0.2, 0.2, 0.2, 1.0};
 	GLfloat diffuseLight[] = {0.8, 0.8, 0.8, 1.0};
