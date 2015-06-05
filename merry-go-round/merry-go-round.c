@@ -554,9 +554,9 @@ void Initialize(void)
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);    
     
-     /* Load first OBJ model */
-     int success;
-     int i = 0;
+    /* Load first OBJ model */
+    int success;
+    int i = 0;
     char* filename1 = "models/teapot.obj"; 
     success = parse_obj_scene(&data6, filename1);
 
@@ -581,16 +581,19 @@ void Initialize(void)
     for(i=0; i<vert; i++)
     {
         vertex_buffer_data6[i*3] = (GLfloat)(*data6.vertex_list[i]).e[0];
-	vertex_buffer_data6[i*3+1] = (GLfloat)(*data6.vertex_list[i]).e[1];
-	vertex_buffer_data6[i*3+2] = (GLfloat)(*data6.vertex_list[i]).e[2];
+		vertex_buffer_data6[i*3+1] = (GLfloat)(*data6.vertex_list[i]).e[1];
+		vertex_buffer_data6[i*3+2] = (GLfloat)(*data6.vertex_list[i]).e[2];
     }
 
     /* Indices */
     for(i=0; i<indx; i++)
     {
-	index_buffer_data6[i*3] = (GLushort)(*data6.face_list[i]).vertex_index[0];
-	index_buffer_data6[i*3+1] = (GLushort)(*data6.face_list[i]).vertex_index[1];
-	index_buffer_data6[i*3+2] = (GLushort)(*data6.face_list[i]).vertex_index[2];
+		index_buffer_data6[i*3] =
+			(GLushort)(*data6.face_list[i]).vertex_index[0];
+		index_buffer_data6[i*3+1] =
+			(GLushort)(*data6.face_list[i]).vertex_index[1];
+		index_buffer_data6[i*3+2] =
+			(GLushort)(*data6.face_list[i]).vertex_index[2];
     }
 
     vert = data7.vertex_count;
@@ -602,17 +605,20 @@ void Initialize(void)
     /* Vertices */
     for(i=0; i<vert; i++)
     {
-	vertex_buffer_data7[i*3] = (GLfloat)(*data7.vertex_list[i]).e[0];
-	vertex_buffer_data7[i*3+1] = (GLfloat)(*data7.vertex_list[i]).e[1];
-	vertex_buffer_data7[i*3+2] = (GLfloat)(*data7.vertex_list[i]).e[2];
+		vertex_buffer_data7[i*3] = (GLfloat)(*data7.vertex_list[i]).e[0];
+		vertex_buffer_data7[i*3+1] = (GLfloat)(*data7.vertex_list[i]).e[1];
+		vertex_buffer_data7[i*3+2] = (GLfloat)(*data7.vertex_list[i]).e[2];
     }
 
     /* Indices */
     for(i=0; i<indx; i++)
     {
-	index_buffer_data7[i*3] = (GLushort)(*data7.face_list[i]).vertex_index[0];
-	index_buffer_data7[i*3+1] = (GLushort)(*data7.face_list[i]).vertex_index[1];
-	index_buffer_data7[i*3+2] = (GLushort)(*data7.face_list[i]).vertex_index[2];
+		index_buffer_data7[i*3] =
+			(GLushort)(*data7.face_list[i]).vertex_index[0];
+		index_buffer_data7[i*3+1] =
+			(GLushort)(*data7.face_list[i]).vertex_index[1];
+		index_buffer_data7[i*3+2] =
+			(GLushort)(*data7.face_list[i]).vertex_index[2];
     }
 
     
@@ -654,6 +660,26 @@ void Initialize(void)
     for(;i<OBJECTS;i++) {
 		SetIdentityMatrix(ModelMatrix[i]);
 	}
+	
+	printf("DEBUG: adding light-source ...\n");
+
+	/* Add lighting source to the code */
+	
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0); // adds first light-source to the scene
+
+	GLfloat ambientLight[] = {0.2, 0.2, 0.2, 1.0};
+	GLfloat diffuseLight[] = {0.8, 0.8, 0.8, 1.0};
+	GLfloat specularLight[]= {1.0, 1.0, 1.0, 1.0};
+	GLfloat positionLight[]= {10.0, 0.0, 0.0, 1.0};
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
+	glLightfv(GL_LIGHT0, GL_POSITION, positionLight);
+	
+	printf("DEBUG: finished adding light-source\n");
 
     /* Set projection transform */
     float fovy = 45.0;
