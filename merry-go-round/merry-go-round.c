@@ -148,25 +148,24 @@ void DisplayOneObject(int i) {
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 
     /* Associate program with shader matrices */
-    GLint projectionUniform = glGetUniformLocation(ShaderProgram, "ProjectionMatrix");
-    if (projectionUniform == -1) 
-    {
+    GLint projectionUniform = glGetUniformLocation(ShaderProgram,
+		"ProjectionMatrix");
+    if (projectionUniform == -1) {
         fprintf(stderr, "Could not bind uniform ProjectionMatrix\n");
-	exit(-1);
+		exit(-1);
     }
     glUniformMatrix4fv(projectionUniform, 1, GL_TRUE, ProjectionMatrix);
     
     GLint ViewUniform = glGetUniformLocation(ShaderProgram, "ViewMatrix");
-    if (ViewUniform == -1) 
-    {
+    if (ViewUniform == -1) {
         fprintf(stderr, "Could not bind uniform ViewMatrix\n");
         exit(-1);
     }
     glUniformMatrix4fv(ViewUniform, 1, GL_TRUE, ViewMatrix);
    
-    GLint RotationUniform = glGetUniformLocation(ShaderProgram, "ModelMatrix");
-    if (RotationUniform == -1) 
-    {
+    GLint RotationUniform = glGetUniformLocation(ShaderProgram,
+		"ModelMatrix");
+    if (RotationUniform == -1) {
         fprintf(stderr, "Could not bind uniform ModelMatrix\n");
         exit(-1);
     }
@@ -226,8 +225,8 @@ void OnIdle()
     /* Apply model rotation; finally move cube down */
     int i = 0;
     for(; i < OBJECTS; i++) {
-	MultiplyMatrix(RotationMatrixAnim, InitialTransform, ModelMatrix[i]);
-	MultiplyMatrix(TranslateDown, ModelMatrix[i], ModelMatrix[i]);
+		MultiplyMatrix(RotationMatrixAnim, InitialTransform, ModelMatrix[i]);
+		MultiplyMatrix(TranslateDown, ModelMatrix[i], ModelMatrix[i]);
     }
 
     // transform karusell
@@ -240,6 +239,9 @@ void OnIdle()
     transform(4,  90.0, 0.3, 0.5 , -1.0, 2.0, 1);
     transform(5, 180.0, 0.3, 0.25, -1.0, 2.0, 1);
     transform(6, 270.0, 0.3, 0.5 , -1.0, 2.0, 1);
+
+	// translate lightsrc 2
+	
 
     /* Request redrawing forof window content */  
     glutPostRedisplay();
@@ -259,77 +261,94 @@ void SetupDataBuffers()
     // ground plane
     glGenBuffers(1, &VBO[0]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data1), vertex_buffer_data1, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data1),
+		vertex_buffer_data1, GL_STATIC_DRAW);
 
     glGenBuffers(1, &IBO[0]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[0]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data1), index_buffer_data1, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data1),
+		index_buffer_data1, GL_STATIC_DRAW);
 
     glGenBuffers(1, &CBO[0]);
     glBindBuffer(GL_ARRAY_BUFFER, CBO[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data1), color_buffer_data1, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data1),
+		color_buffer_data1, GL_STATIC_DRAW);
  
     // stange
     glGenBuffers(1, &VBO[1]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data2), vertex_buffer_data2, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data2),
+		vertex_buffer_data2, GL_STATIC_DRAW);
 
     glGenBuffers(1, &IBO[1]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[1]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data2), index_buffer_data2, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data2), 
+		index_buffer_data2, GL_STATIC_DRAW);
 
     glGenBuffers(1, &CBO[1]);
     glBindBuffer(GL_ARRAY_BUFFER, CBO[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data2), color_buffer_data2, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data2), 
+		color_buffer_data2, GL_STATIC_DRAW);
       
     // kopf
     glGenBuffers(1, &VBO[2]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data3), vertex_buffer_data3, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data3), 
+		vertex_buffer_data3, GL_STATIC_DRAW);
 
     glGenBuffers(1, &IBO[2]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[2]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data3), index_buffer_data3, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data3), 
+		index_buffer_data3, GL_STATIC_DRAW);
 
     glGenBuffers(1, &CBO[2]);
     glBindBuffer(GL_ARRAY_BUFFER, CBO[2]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data3), color_buffer_data3, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data3), 
+		color_buffer_data3, GL_STATIC_DRAW);
 
     // cube 1    
     glGenBuffers(1, &VBO[3]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
-    glBufferData(GL_ARRAY_BUFFER, data6.vertex_count*3*sizeof(GLfloat), vertex_buffer_data4, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, data6.vertex_count*3*sizeof(GLfloat), 
+		vertex_buffer_data4, GL_STATIC_DRAW);
 
     glGenBuffers(1, &IBO[3]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[3]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data6.face_count*3*sizeof(GLushort), index_buffer_data4, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data6.face_count*3*sizeof(GLushort),
+		index_buffer_data4, GL_STATIC_DRAW);
 
     // cube 2
 
     glGenBuffers(1, &VBO[4]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[4]);
-    glBufferData(GL_ARRAY_BUFFER, data7.vertex_count*3*sizeof(GLfloat), vertex_buffer_data5, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, data7.vertex_count*3*sizeof(GLfloat),
+		vertex_buffer_data5, GL_STATIC_DRAW);
 
     glGenBuffers(1, &IBO[4]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[4]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data7.vertex_count*3*sizeof(GLushort), index_buffer_data5, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data7.vertex_count * 3 * 
+		sizeof(GLushort), index_buffer_data5, GL_STATIC_DRAW);
     // cube 3
     glGenBuffers(1, &VBO[5]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[5]);
-    glBufferData(GL_ARRAY_BUFFER, data6.vertex_count*3*sizeof(GLfloat), vertex_buffer_data6, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, data6.vertex_count*3*sizeof(GLfloat),
+		vertex_buffer_data6, GL_STATIC_DRAW);
 
     glGenBuffers(1, &IBO[5]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[5]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data6.face_count*3*sizeof(GLushort), index_buffer_data6, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data6.face_count * 3 * 
+		sizeof(GLushort), index_buffer_data6, GL_STATIC_DRAW);
 
     // cube 4
     glGenBuffers(1, &VBO[6]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[6]);
-    glBufferData(GL_ARRAY_BUFFER, data7.vertex_count*3*sizeof(GLfloat), vertex_buffer_data7, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, data7.vertex_count*3*sizeof(GLfloat),
+		vertex_buffer_data7, GL_STATIC_DRAW);
 
     glGenBuffers(1, &IBO[6]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[6]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data7.vertex_count*3*sizeof(GLushort), index_buffer_data7, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data7.vertex_count * 3 * 
+		sizeof(GLushort), index_buffer_data7, GL_STATIC_DRAW);
 }
 
 
@@ -362,10 +381,10 @@ void AddShader(GLuint ShaderProgram, const char* ShaderCode, GLenum ShaderType)
     glCompileShader(ShaderObj);
     glGetShaderiv(ShaderObj, GL_COMPILE_STATUS, &success);
 
-    if (!success) 
-    {
+    if (!success) {
         glGetShaderInfoLog(ShaderObj, 1024, NULL, InfoLog);
-        fprintf(stderr, "Error compiling shader type %d: '%s'\n", ShaderType, InfoLog);
+        fprintf(stderr, "Error compiling shader type %d: '%s'\n", ShaderType, 
+			InfoLog);
         exit(1);
     }
 
@@ -389,8 +408,7 @@ void CreateShaderProgram()
     /* Allocate shader object */
     ShaderProgram = glCreateProgram();
 
-    if (ShaderProgram == 0) 
-    {
+    if (ShaderProgram == 0) {
         fprintf(stderr, "Error creating shader program\n");
         exit(1);
     }
@@ -404,7 +422,7 @@ void CreateShaderProgram()
     AddShader(ShaderProgram, FragmentShaderString, GL_FRAGMENT_SHADER);
 
     GLint Success = 0;
-    GLchar ErrorLog[1024];
+    GLchar ErrorLog[1024]
 
     /* Link shader code into executable shader program */
     glLinkProgram(ShaderProgram);
@@ -412,8 +430,7 @@ void CreateShaderProgram()
     /* Check results of linking step */
     glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
 
-    if (Success == 0) 
-    {
+    if (Success == 0) {
         glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
         fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
         exit(1);
@@ -423,8 +440,7 @@ void CreateShaderProgram()
     glValidateProgram(ShaderProgram);
     glGetProgramiv(ShaderProgram, GL_VALIDATE_STATUS, &Success);
 
-    if (!Success) 
-    {
+    if (!Success) {
         glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
         fprintf(stderr, "Invalid shader program: '%s'\n", ErrorLog);
         exit(1);
@@ -674,11 +690,12 @@ void Initialize(void)
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_LIGHT0); // adds first light-source to the scene
+	glEnable(GL_LIGHT1);
 
 	GLfloat ambientLight[] = {0.2, 0.2, 0.2, 1.0};
 	GLfloat diffuseLight[] = {0.8, 0.8, 0.8, 1.0};
 	GLfloat specularLight[]= {1.0, 1.0, 1.0, 1.0};
-	GLfloat positionLight[]= {5.0, 0.0, 0.0, 0.0};
+	GLfloat positionLight[]= {-2.0, -2.0, -2.0, 0.0};
 	
 	//glShadeModel(GL_SMOOTH);
 	
@@ -744,8 +761,7 @@ int main(int argc, char** argv)
 
     /* Initialize GL extension wrangler */
     GLenum res = glewInit();
-    if (res != GLEW_OK) 
-    {
+    if (res != GLEW_OK) {
         fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
         return 1;
     }
@@ -757,7 +773,6 @@ int main(int argc, char** argv)
      * handing control over to GLUT */
     glutIdleFunc(OnIdle);
     glutDisplayFunc(Display);
-    
     
     if (mode == 1) {
 		printf("**********Mode 1**********\nControlling:\nd: moving right\na: moving left\nspace: pause\n1,2,3: speed\n");
