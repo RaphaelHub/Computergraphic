@@ -86,7 +86,7 @@ GLfloat vertex_buffer_data4[sizeof(vertex_cube)];
 GLfloat vertex_buffer_data5[sizeof(vertex_cube)];
 GLfloat vertex_buffer_data6[sizeof(vertex_cube)];
 GLfloat vertex_buffer_data7[sizeof(vertex_cube)];
-
+/*
 GLfloat color_buffer_data1[sizeof(color_octagon)];
 GLfloat color_buffer_data2[sizeof(color_pyramid)];
 GLfloat color_buffer_data3[sizeof(color_mainBar)];
@@ -94,6 +94,25 @@ GLfloat color_buffer_data4[sizeof(color_cube)];
 GLfloat color_buffer_data5[sizeof(color_cube)];
 GLfloat color_buffer_data6[sizeof(color_cube)];
 GLfloat color_buffer_data7[sizeof(color_cube)];
+*/
+GLfloat color[4];
+int colorInterpolation;
+
+GLfloat intensities[OBJECTS][4] = {
+	{0.1, 0.1, 0.1, 0.1},
+	{0.2, 0.2, 0.2, 0.2},
+	{0.3, 0.3, 0.3, 0.3},
+	{0.4, 0.4, 0.4, 0.4},
+	{0.5, 0.5, 0.5, 0.5},
+	{0.6, 0.6, 0.6, 0.6},
+	{0.7, 0.7, 0.7, 0.7}
+};
+
+int specular = 1;
+int diffuse = 1;
+int ambient = 1;
+
+GLuint shaderType = 1;
 
 GLushort index_buffer_data1[sizeof(index_octagon)];
 GLushort index_buffer_data2[sizeof(index_pyramid)];
@@ -141,11 +160,11 @@ void DisplayOneObject(int i) {
     
     glBindBuffer(GL_ARRAY_BUFFER, VBO[i]);
     glVertexAttribPointer(vPosition, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
+/*
     glEnableVertexAttribArray(vColor);
     glBindBuffer(GL_ARRAY_BUFFER, CBO[i]);
     glVertexAttribPointer(vColor, 3, GL_FLOAT,GL_FALSE, 0, 0);   
-
+*/
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[i]);
     GLint size; 
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -158,7 +177,29 @@ void DisplayOneObject(int i) {
 	exit(-1);
     }
     glUniformMatrix4fv(projectionUniform, 1, GL_TRUE, ProjectionMatrix);
-    
+  
+	GLint colorUniform = glGetUniformLocation(ShaderProgram, "Color");
+	if(colorUniform == -1) {
+		fprintf(stderr, "Could not bind uniform Color\n");
+		exit(-1);
+	}
+	glUniform4f(colorUniform, color[0], color[1], color[2], color[3]);
+
+	GLint lightModeUniform = glGetUniformLocation(ShaderProgram, "lightMode");
+	if(lightModeUniform == -1) {
+		fprintf(stderr, "Cound not bind uniform lightMode\n");
+		exit(-1);
+	}
+	glUniform1f(lightModeUniform, (float)shaderType);
+
+	GLint intensitiesUniform = glGetUniformLocation(ShaderProgram, "intensities");
+	if(intensitiesUniform == -1) {
+		fprintf(stderr, "Could not bind uniform intensities\n");
+		exit(-1);
+	}
+	glUniform4f(intensitiesUniform, intensities[i][0]*specular, intensities[i][1]*diffuse, intensities[i][2]*ambient, intensities[i][3]);
+
+ 
     GLint ViewUniform = glGetUniformLocation(ShaderProgram, "ViewMatrix");
     if (ViewUniform == -1) 
     {
@@ -268,9 +309,9 @@ void SetupDataBuffers()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[0]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data1), index_buffer_data1, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &CBO[0]);
-    glBindBuffer(GL_ARRAY_BUFFER, CBO[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data1), color_buffer_data1, GL_STATIC_DRAW);
+//    glGenBuffers(1, &CBO[0]);
+//    glBindBuffer(GL_ARRAY_BUFFER, CBO[0]);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data1), color_buffer_data1, GL_STATIC_DRAW);
     
     // stange
     glGenBuffers(1, &VBO[1]);
@@ -281,9 +322,9 @@ void SetupDataBuffers()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[1]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data2), index_buffer_data2, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &CBO[1]);
-    glBindBuffer(GL_ARRAY_BUFFER, CBO[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data2), color_buffer_data2, GL_STATIC_DRAW);
+//    glGenBuffers(1, &CBO[1]);
+//    glBindBuffer(GL_ARRAY_BUFFER, CBO[1]);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data2), color_buffer_data2, GL_STATIC_DRAW);
         
     // kopf
     glGenBuffers(1, &VBO[2]);
@@ -294,9 +335,9 @@ void SetupDataBuffers()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[2]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data3), index_buffer_data3, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &CBO[2]);
-    glBindBuffer(GL_ARRAY_BUFFER, CBO[2]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data3), color_buffer_data3, GL_STATIC_DRAW);
+//    glGenBuffers(1, &CBO[2]);
+//    glBindBuffer(GL_ARRAY_BUFFER, CBO[2]);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data3), color_buffer_data3, GL_STATIC_DRAW);
    
     // cube 1
     glGenBuffers(1, &VBO[3]);
@@ -307,9 +348,9 @@ void SetupDataBuffers()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[3]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data4), index_buffer_data4, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &CBO[3]);
-    glBindBuffer(GL_ARRAY_BUFFER, CBO[3]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data4), color_buffer_data4, GL_STATIC_DRAW);
+//    glGenBuffers(1, &CBO[3]);
+//    glBindBuffer(GL_ARRAY_BUFFER, CBO[3]);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data4), color_buffer_data4, GL_STATIC_DRAW);
 
     // cube 2
     glGenBuffers(1, &VBO[4]);
@@ -320,9 +361,9 @@ void SetupDataBuffers()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[4]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data5), index_buffer_data5, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &CBO[4]);
-    glBindBuffer(GL_ARRAY_BUFFER, CBO[4]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data5), color_buffer_data5, GL_STATIC_DRAW);
+//    glGenBuffers(1, &CBO[4]);
+//    glBindBuffer(GL_ARRAY_BUFFER, CBO[4]);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data5), color_buffer_data5, GL_STATIC_DRAW);
 
     // cube 3
     glGenBuffers(1, &VBO[5]);
@@ -333,9 +374,9 @@ void SetupDataBuffers()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[5]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data6), index_buffer_data6, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &CBO[5]);
-    glBindBuffer(GL_ARRAY_BUFFER, CBO[5]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data6), color_buffer_data6, GL_STATIC_DRAW);
+//    glGenBuffers(1, &CBO[5]);
+//    glBindBuffer(GL_ARRAY_BUFFER, CBO[5]);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data6), color_buffer_data6, GL_STATIC_DRAW);
 
     // cube 4
     glGenBuffers(1, &VBO[6]);
@@ -346,9 +387,9 @@ void SetupDataBuffers()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[6]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data7), index_buffer_data7, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &CBO[6]);
-    glBindBuffer(GL_ARRAY_BUFFER, CBO[6]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data7), color_buffer_data7, GL_STATIC_DRAW);
+//    glGenBuffers(1, &CBO[6]);
+//    glBindBuffer(GL_ARRAY_BUFFER, CBO[6]);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data7), color_buffer_data7, GL_STATIC_DRAW);
 }
 
 
@@ -570,7 +611,7 @@ void Initialize(void)
     memcpy(vertex_buffer_data5, vertex_cube, sizeof(vertex_cube));
     memcpy(vertex_buffer_data6, vertex_cube, sizeof(vertex_cube));
     memcpy(vertex_buffer_data7, vertex_cube, sizeof(vertex_cube));
-
+/*
     memcpy(color_buffer_data1, color_octagon, sizeof(color_octagon));
     memcpy(color_buffer_data2, color_pyramid, sizeof(color_pyramid));
     memcpy(color_buffer_data3, color_mainBar, sizeof(color_mainBar));
@@ -578,7 +619,7 @@ void Initialize(void)
     memcpy(color_buffer_data5, color_cube, sizeof(color_cube));
     memcpy(color_buffer_data6, color_cube, sizeof(color_cube));
     memcpy(color_buffer_data7, color_cube, sizeof(color_cube));
-
+*/
     memcpy(index_buffer_data1, index_octagon, sizeof(index_octagon));
     memcpy(index_buffer_data2, index_pyramid, sizeof(index_pyramid));
     memcpy(index_buffer_data3, index_mainBar, sizeof(index_mainBar));
@@ -622,12 +663,15 @@ void Initialize(void)
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
 	glLightfv(GL_LIGHT0, GL_POSITION, positionLight);
 	
-	GLfloat matSpecular[] = {1.0, 1.0, 1.0, 1.0};
-	GLfloat matShininess[] = {50.0};
-	/*
-	glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
-	*/
+	GLfloat black[] = {0.0, 0.0, 0.0, 1.0};
+	GLfloat green[] = {0.0, 1.0, 0.0, 1.0};
+	GLfloat white[] = {1.0, 1.0, 1.0, 1.0};
+	
+	glMaterialfv(GL_FRONT, GL_AMBIENT, green);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+	glMaterialf(GL_FRONT, GL_SHININESS, 60.0);
+	
 	printf("DEBUG: finished adding light-source\n");
 
     /* Set projection transform */
