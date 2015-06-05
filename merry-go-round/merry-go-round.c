@@ -35,7 +35,7 @@
 #include "Octagon.h"
 #include "Pyramid.h"
 #include "mainBar.h"
-#include "cube.h"
+//#include "cube.h"
 
 /*----------------------------------------------------------------*/
 
@@ -82,22 +82,21 @@ obj_scene_data data7, data6;
 GLfloat vertex_buffer_data1[sizeof(vertex_octagon)]; 
 GLfloat vertex_buffer_data2[sizeof(vertex_pyramid)];  
 GLfloat vertex_buffer_data3[sizeof(vertex_mainBar)]; 
-GLfloat vertex_buffer_data4[sizeof(vertex_cube)];
-GLfloat vertex_buffer_data5[sizeof(vertex_cube)];
+GLfloat *vertex_buffer_data4;
+GLfloat *vertex_buffer_data5;
 GLfloat *vertex_buffer_data6;
 GLfloat *vertex_buffer_data7;
 
 GLfloat color_buffer_data1[sizeof(color_octagon)];
 GLfloat color_buffer_data2[sizeof(color_pyramid)];
 GLfloat color_buffer_data3[sizeof(color_mainBar)];
-GLfloat color_buffer_data4[sizeof(color_cube)];
-GLfloat color_buffer_data5[sizeof(color_cube)];
+
 
 GLushort index_buffer_data1[sizeof(index_octagon)];
 GLushort index_buffer_data2[sizeof(index_pyramid)];
 GLushort index_buffer_data3[sizeof(index_mainBar)];
-GLushort index_buffer_data4[sizeof(index_cube)];
-GLushort index_buffer_data5[sizeof(index_cube)];
+GLushort *index_buffer_data4;
+GLushort *index_buffer_data5;
 GLushort *index_buffer_data6;
 GLushort *index_buffer_data7;
 
@@ -237,10 +236,10 @@ void OnIdle()
     transform(2, 0.0, 0.3, 1.0, -2.5, 0.0, 0);
 
     // transform cube
-    transform(3,   0.0, 0.3, 0.5, -1.0, 2.0, 1);
-    transform(4,  90.0, 0.3, 0.5, -1.0, 2.0, 1);
-    transform(5, 180.0, 0.3, 0.5, -1.0, 2.0, 1);
-    transform(6, 270.0, 0.3, 0.5, -1.0, 2.0, 1);
+    transform(3,   0.0, 0.3, 0.25, -1.0, 2.0, 1);
+    transform(4,  90.0, 0.3, 0.5 , -1.0, 2.0, 1);
+    transform(5, 180.0, 0.3, 0.25, -1.0, 2.0, 1);
+    transform(6, 270.0, 0.3, 0.5 , -1.0, 2.0, 1);
 
     /* Request redrawing forof window content */  
     glutPostRedisplay();
@@ -269,7 +268,7 @@ void SetupDataBuffers()
     glGenBuffers(1, &CBO[0]);
     glBindBuffer(GL_ARRAY_BUFFER, CBO[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data1), color_buffer_data1, GL_STATIC_DRAW);
-    
+ 
     // stange
     glGenBuffers(1, &VBO[1]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
@@ -282,7 +281,7 @@ void SetupDataBuffers()
     glGenBuffers(1, &CBO[1]);
     glBindBuffer(GL_ARRAY_BUFFER, CBO[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data2), color_buffer_data2, GL_STATIC_DRAW);
-        
+      
     // kopf
     glGenBuffers(1, &VBO[2]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
@@ -295,33 +294,25 @@ void SetupDataBuffers()
     glGenBuffers(1, &CBO[2]);
     glBindBuffer(GL_ARRAY_BUFFER, CBO[2]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data3), color_buffer_data3, GL_STATIC_DRAW);
-   
-    // cube 1
+
+    // cube 1    
     glGenBuffers(1, &VBO[3]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data4), vertex_buffer_data4, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, data6.vertex_count*3*sizeof(GLfloat), vertex_buffer_data4, GL_STATIC_DRAW);
 
     glGenBuffers(1, &IBO[3]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[3]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data4), index_buffer_data4, GL_STATIC_DRAW);
-
-    glGenBuffers(1, &CBO[3]);
-    glBindBuffer(GL_ARRAY_BUFFER, CBO[3]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data4), color_buffer_data4, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data6.face_count*3*sizeof(GLushort), index_buffer_data4, GL_STATIC_DRAW);
 
     // cube 2
+
     glGenBuffers(1, &VBO[4]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[4]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data5), vertex_buffer_data5, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, data7.vertex_count*3*sizeof(GLfloat), vertex_buffer_data5, GL_STATIC_DRAW);
 
     glGenBuffers(1, &IBO[4]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[4]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_buffer_data5), index_buffer_data5, GL_STATIC_DRAW);
-
-    glGenBuffers(1, &CBO[4]);
-    glBindBuffer(GL_ARRAY_BUFFER, CBO[4]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data5), color_buffer_data5, GL_STATIC_DRAW);
-
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data7.vertex_count*3*sizeof(GLushort), index_buffer_data5, GL_STATIC_DRAW);
     // cube 3
     glGenBuffers(1, &VBO[5]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[5]);
@@ -331,8 +322,6 @@ void SetupDataBuffers()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[5]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, data6.face_count*3*sizeof(GLushort), index_buffer_data6, GL_STATIC_DRAW);
 
-
-
     // cube 4
     glGenBuffers(1, &VBO[6]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[6]);
@@ -341,9 +330,6 @@ void SetupDataBuffers()
     glGenBuffers(1, &IBO[6]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO[6]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, data7.vertex_count*3*sizeof(GLushort), index_buffer_data7, GL_STATIC_DRAW);
-
-
-
 }
 
 
@@ -574,51 +560,78 @@ void Initialize(void)
     int vert = data6.vertex_count;
     int indx = data6.face_count;
 
+    vertex_buffer_data4 = (GLfloat*) calloc(vert*3, sizeof(GLfloat));
     vertex_buffer_data6 = (GLfloat*) calloc (vert*3, sizeof(GLfloat));
+    index_buffer_data4 = (GLushort*) calloc(indx*3, sizeof(GLushort));
     index_buffer_data6 = (GLushort*) calloc (indx*3, sizeof(GLushort));
   
     /* Vertices */
     for(i=0; i<vert; i++)
     {
         vertex_buffer_data6[i*3] = (GLfloat)(*data6.vertex_list[i]).e[0];
-		vertex_buffer_data6[i*3+1] = (GLfloat)(*data6.vertex_list[i]).e[1];
-		vertex_buffer_data6[i*3+2] = (GLfloat)(*data6.vertex_list[i]).e[2];
+	vertex_buffer_data6[i*3+1] = (GLfloat)(*data6.vertex_list[i]).e[1];
+	vertex_buffer_data6[i*3+2] = (GLfloat)(*data6.vertex_list[i]).e[2];
+	
+	vertex_buffer_data4[i*3] = (GLfloat)(*data6.vertex_list[i]).e[0];
+	vertex_buffer_data4[i*3+1] = (GLfloat)(*data6.vertex_list[i]).e[1];
+	vertex_buffer_data4[i*3+2] = (GLfloat)(*data6.vertex_list[i]).e[2];
     }
 
     /* Indices */
     for(i=0; i<indx; i++)
     {
-		index_buffer_data6[i*3] =
-			(GLushort)(*data6.face_list[i]).vertex_index[0];
-		index_buffer_data6[i*3+1] =
-			(GLushort)(*data6.face_list[i]).vertex_index[1];
-		index_buffer_data6[i*3+2] =
-			(GLushort)(*data6.face_list[i]).vertex_index[2];
+	index_buffer_data6[i*3] =
+		(GLushort)(*data6.face_list[i]).vertex_index[0];
+	index_buffer_data6[i*3+1] =
+		(GLushort)(*data6.face_list[i]).vertex_index[1];
+	index_buffer_data6[i*3+2] =
+		(GLushort)(*data6.face_list[i]).vertex_index[2];
+		
+	index_buffer_data4[i*3] =
+		(GLushort)(*data6.face_list[i]).vertex_index[0];
+	index_buffer_data4[i*3+1] =
+		(GLushort)(*data6.face_list[i]).vertex_index[1];
+	index_buffer_data4[i*3+2] =
+		(GLushort)(*data6.face_list[i]).vertex_index[2];
     }
 
     vert = data7.vertex_count;
     indx = data7.face_count;
 
+    vertex_buffer_data5 = (GLfloat*) calloc(vert*3, sizeof(GLfloat));
     vertex_buffer_data7 = (GLfloat*) calloc (vert*3, sizeof(GLfloat));
+    index_buffer_data5 = (GLushort*) calloc(indx*3, sizeof(GLushort));
     index_buffer_data7 = (GLushort*) calloc (indx*3, sizeof(GLushort));
  
     /* Vertices */
     for(i=0; i<vert; i++)
     {
-		vertex_buffer_data7[i*3] = (GLfloat)(*data7.vertex_list[i]).e[0];
-		vertex_buffer_data7[i*3+1] = (GLfloat)(*data7.vertex_list[i]).e[1];
-		vertex_buffer_data7[i*3+2] = (GLfloat)(*data7.vertex_list[i]).e[2];
+	vertex_buffer_data7[i*3] = (GLfloat)(*data7.vertex_list[i]).e[0];
+	vertex_buffer_data7[i*3+1] = (GLfloat)(*data7.vertex_list[i]).e[1];
+	vertex_buffer_data7[i*3+2] = (GLfloat)(*data7.vertex_list[i]).e[2];
+	
+	vertex_buffer_data5[i*3] = (GLfloat)(*data7.vertex_list[i]).e[0];
+	vertex_buffer_data5[i*3+1] = (GLfloat)(*data7.vertex_list[i]).e[1];
+	vertex_buffer_data5[i*3+2] = (GLfloat)(*data7.vertex_list[i]).e[2];
     }
 
     /* Indices */
     for(i=0; i<indx; i++)
     {
-		index_buffer_data7[i*3] =
-			(GLushort)(*data7.face_list[i]).vertex_index[0];
-		index_buffer_data7[i*3+1] =
-			(GLushort)(*data7.face_list[i]).vertex_index[1];
-		index_buffer_data7[i*3+2] =
-			(GLushort)(*data7.face_list[i]).vertex_index[2];
+	index_buffer_data7[i*3] =
+		(GLushort)(*data7.face_list[i]).vertex_index[0];
+	index_buffer_data7[i*3+1] =
+		(GLushort)(*data7.face_list[i]).vertex_index[1];
+	index_buffer_data7[i*3+2] =
+		(GLushort)(*data7.face_list[i]).vertex_index[2];
+
+    
+	index_buffer_data5[i*3] =
+		(GLushort)(*data7.face_list[i]).vertex_index[0];
+	index_buffer_data5[i*3+1] =
+		(GLushort)(*data7.face_list[i]).vertex_index[1];
+	index_buffer_data5[i*3+2] =
+		(GLushort)(*data7.face_list[i]).vertex_index[2];
     }
 
     
@@ -627,25 +640,17 @@ void Initialize(void)
     memcpy(vertex_buffer_data2, vertex_pyramid, sizeof(vertex_pyramid));
     memcpy(vertex_buffer_data3, vertex_mainBar, sizeof(vertex_mainBar));
     
-    memcpy(vertex_buffer_data4, vertex_cube, sizeof(vertex_cube));    
-    memcpy(vertex_buffer_data5, vertex_cube, sizeof(vertex_cube));
-
-
     memcpy(color_buffer_data1, color_octagon, sizeof(color_octagon));
     memcpy(color_buffer_data2, color_pyramid, sizeof(color_pyramid));
     memcpy(color_buffer_data3, color_mainBar, sizeof(color_mainBar));
-    
-    memcpy(color_buffer_data4, color_cube, sizeof(color_cube));    
-    memcpy(color_buffer_data5, color_cube, sizeof(color_cube));
-
 
     memcpy(index_buffer_data1, index_octagon, sizeof(index_octagon));
     memcpy(index_buffer_data2, index_pyramid, sizeof(index_pyramid));
     memcpy(index_buffer_data3, index_mainBar, sizeof(index_mainBar));
-    
+    /*
     memcpy(index_buffer_data4, index_cube, sizeof(index_cube));
     memcpy(index_buffer_data5, index_cube, sizeof(index_cube));
-
+    */
 
     /* Setup vertex, color, and index buffer objects */
     SetupDataBuffers();
@@ -667,18 +672,27 @@ void Initialize(void)
 	
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 	glEnable(GL_LIGHTING);
+	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_LIGHT0); // adds first light-source to the scene
 
 	GLfloat ambientLight[] = {0.2, 0.2, 0.2, 1.0};
 	GLfloat diffuseLight[] = {0.8, 0.8, 0.8, 1.0};
 	GLfloat specularLight[]= {1.0, 1.0, 1.0, 1.0};
-	GLfloat positionLight[]= {10.0, 0.0, 0.0, 1.0};
-
+	GLfloat positionLight[]= {5.0, 0.0, 0.0, 0.0};
+	
+	//glShadeModel(GL_SMOOTH);
+	
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
 	glLightfv(GL_LIGHT0, GL_POSITION, positionLight);
 	
+	GLfloat matSpecular[] = {1.0, 1.0, 1.0, 1.0};
+	GLfloat matShininess[] = {50.0};
+	/*
+	glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
+	*/
 	printf("DEBUG: finished adding light-source\n");
 
     /* Set projection transform */
@@ -703,9 +717,6 @@ void Initialize(void)
     /* Initial transformation matrix */
     MultiplyMatrix(RotateX, TranslateOrigin, InitialTransform);
     MultiplyMatrix(RotateZ, InitialTransform, InitialTransform);
-    
-	
-    
 }
 
 
