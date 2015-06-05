@@ -32,12 +32,9 @@
 
 const char* LoadShader(const char* filename)
 {
-#ifdef WIN32
-    FILE* infile;
-    fopen_s(&infile, filename, "rb");
-#else
+
     FILE* infile = fopen(filename, "rb");
-#endif // WIN32
+
 
     if (!infile) 
     {

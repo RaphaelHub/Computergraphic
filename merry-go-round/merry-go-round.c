@@ -15,7 +15,7 @@
 *******************************************************************/
 
 /* for Windows */
-//#define GLEW_STATIC
+#define GLEW_STATIC
 
 /* Standard includes */
 #include <stdio.h>
@@ -31,6 +31,7 @@
 /* Local includes */
 #include "LoadShader.h"   /* Provides loading function for shader code */
 #include "Matrix.h"  
+#include "OBJParser.h" 
 #include "Octagon.h"
 #include "Pyramid.h"
 #include "mainBar.h"
@@ -74,6 +75,9 @@ float InitialTransform[16];
 int mouse_x;
 int mouse_y;
 
+/* Structures for loading of OBJ data */
+obj_scene_data data7, data6;
+
 
 GLfloat vertex_buffer_data1[sizeof(vertex_octagon)]; 
 GLfloat vertex_buffer_data2[sizeof(vertex_pyramid)];  
@@ -108,7 +112,7 @@ void transform(int i, float rot_offset, float rot_speed, float size,
     float RotationMatrixAnim[16];
     float ScaleMatrix[16];
     float InitialTransform[16];
-    float scale = 0.01;
+    float scale = 0.001;
     float maxHeight = height + 0.5;
     float minHeight = height - 0.5;
     static int up[OBJECTS];
@@ -117,7 +121,7 @@ void transform(int i, float rot_offset, float rot_speed, float size,
     if(wobble == 1) {
         if(up[i] == 0)  height = maxHeight - (time[i]++) * scale;
         else            height = minHeight + (time[i]++) * scale;
-        if(time[i] >= 100) {
+        if(time[i] >= 1000) {
             up[i] = (up[i] == 0) ? 1 : 0;
             time[i] = 0;
         }
@@ -216,18 +220,18 @@ void Display()
 
 void OnIdle()
 {
-    //float angle = (glutGet(GLUT_ELAPSED_TIME) / 1000.0) * (180.0/M_PI); 
-    //float RotationMatrixAnim[16];
+    float angle = (glutGet(GLUT_ELAPSED_TIME) / 1000.0) * (180.0/M_PI); 
+    float RotationMatrixAnim[16];
 
     /* Time dependent rotation */
-    //SetRotationY(angle, RotationMatrixAnim);
+    SetRotationY(angle, RotationMatrixAnim);
 
     /* Apply model rotation; finally move cube down */
-    //int i = 0;
-    //for(; i < OBJECTS; i++) {
-	//	MultiplyMatrix(RotationMatrixAnim, InitialTransform, ModelMatrix[i]);
-	//	MultiplyMatrix(TranslateDown, ModelMatrix[i], ModelMatrix[i]);
-//}
+    int i = 0;
+    for(; i < OBJECTS; i++) {
+	MultiplyMatrix(RotationMatrixAnim, InitialTransform, ModelMatrix[i]);
+	MultiplyMatrix(TranslateDown, ModelMatrix[i], ModelMatrix[i]);
+    }
 
     // transform karusell
     transform(0, 0.0, 0.3, 1.0, -2.5, 0.0, 0);
@@ -235,10 +239,10 @@ void OnIdle()
     transform(2, 0.0, 0.3, 1.0, -2.5, 0.0, 0);
 
     // transform cube
-    transform(3,   0.0, 0.3, 0.5, -1.0, 2.0, 1);
-    transform(4,  90.0, 0.3, 0.5, -1.0, 2.0, 1);
-    transform(5, 180.0, 0.3, 0.5, -1.0, 2.0, 1);
-    transform(6, 270.0, 0.3, 0.5, -1.0, 2.0, 1);
+    transform(3,   0.0, 0.3, 0.25, -1.0, 2.0, 1);
+    transform(4,  90.0, 0.3, 0.5 , -1.0, 2.0, 1);
+    transform(5, 180.0, 0.3, 0.25, -1.0, 2.0, 1);
+    transform(6, 270.0, 0.3, 0.5 , -1.0, 2.0, 1);
 
     /* Request redrawing forof window content */  
     glutPostRedisplay();
@@ -255,7 +259,7 @@ void OnIdle()
 
 void SetupDataBuffers()
 {
-    // ground plane
+     // ground plane
     glGenBuffers(1, &VBO[0]);
     glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_buffer_data1), vertex_buffer_data1, GL_STATIC_DRAW);
@@ -345,7 +349,6 @@ void SetupDataBuffers()
     glGenBuffers(1, &CBO[6]);
     glBindBuffer(GL_ARRAY_BUFFER, CBO[6]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(color_buffer_data7), color_buffer_data7, GL_STATIC_DRAW);
-
 }
 
 
@@ -549,7 +552,7 @@ void mouse(int button, int state, int x, int y){
 
 void Initialize(void)
 {   
-    /* Set background (clear) color to dark blue */ 
+      /* Set background (clear) color to dark blue */ 
     glClearColor(0.0, 0.0, 0.4, 0.0);
 
     /* Enable depth testing */
@@ -592,10 +595,64 @@ void Initialize(void)
     /* Initialize matrices */
     SetIdentityMatrix(ProjectionMatrix);
     SetIdentityMatrix(ViewMatrix);
-    int i = 0;
+   int i = 0;
     for(;i<OBJECTS;i++) {
 		SetIdentityMatrix(ModelMatrix[i]);
 	}
+	
+	printf("DEBUG: adding light-source ...\n");
+
+	/* Add lighting source to the code */
+	
+//	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_LIGHT0); // adds first light-source to the scene
+	
+	 // Light model parameters:
+     // -------------------------------------------
+     
+     GLfloat lmKa[] = {0.0, 0.0, 0.0, 0.0 };
+     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmKa);
+     
+     glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, 1.0);
+     glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, 0.0);
+     
+	GLfloat spot_direction[] = {1.0, -1.0, -1.0 };
+     GLint spot_exponent = 30;
+     GLint spot_cutoff = 180;
+     
+     glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction);
+     glLighti(GL_LIGHT0, GL_SPOT_EXPONENT, spot_exponent);
+     glLighti(GL_LIGHT0, GL_SPOT_CUTOFF, spot_cutoff);
+    
+     GLfloat Kc = 1.0;
+     GLfloat Kl = 0.0;
+     GLfloat Kq = 0.0;
+     
+     glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION,Kc);
+     glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, Kl);
+     glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, Kq);
+
+	GLfloat ambientLight[] = {0.2, 0.2, 0.2, 1.0};
+	GLfloat diffuseLight[] = {0.8, 0.8, 0.8, 1.0};
+	GLfloat specularLight[]= {1.0, 1.0, 1.0, 1.0};
+	GLfloat positionLight[]= {5.0, 0.0, 0.0, 0.0};
+	
+	//glShadeModel(GL_SMOOTH);
+	
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
+	glLightfv(GL_LIGHT0, GL_POSITION, positionLight);
+	
+	GLfloat matSpecular[] = {1.0, 1.0, 1.0, 1.0};
+	GLfloat matShininess[] = {50.0};
+	/*
+	glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
+	*/
+	printf("DEBUG: finished adding light-source\n");
 
     /* Set projection transform */
     float fovy = 45.0;
@@ -619,9 +676,6 @@ void Initialize(void)
     /* Initial transformation matrix */
     MultiplyMatrix(RotateX, TranslateOrigin, InitialTransform);
     MultiplyMatrix(RotateZ, InitialTransform, InitialTransform);
-    
-   	
-    
 }
 
 
@@ -639,7 +693,7 @@ int main(int argc, char** argv)
     int mode = 0;
     printf("choose your camera mode (1,2)\n");
     scanf("%d", &mode);
-    
+  
     /* Initialize GLUT; set double buffered window and RGBA color model */
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
@@ -663,17 +717,17 @@ int main(int argc, char** argv)
     glutIdleFunc(OnIdle);
     glutDisplayFunc(Display);
     
-    if (mode == 1) {
-	printf("**********Mode 1**********\nControlling:\nd: moving right\na: moving left\nspace: pause\n1,2,3: speed\n");
-	glutKeyboardFunc(keyboard1);
-    } else if (mode == 2) {
-	printf("**********Mode 2**********\nControlling:\nd: right\na: left\nw: up\ns: down\nspace: back to center\nmouse left-click and hold to direction\n");
-	glutKeyboardFunc(keyboard2);
-	glutMouseFunc(mouse);
-    } else {
-	return 0;
-    }
     
+    if (mode == 1) {
+		printf("**********Mode 1**********\nControlling:\nd: moving right\na: moving left\nspace: pause\n1,2,3: speed\n");
+		glutKeyboardFunc(keyboard1);
+	} else if (mode == 2) {
+		printf("**********Mode 2**********\nControlling:\nd: right\na: left\nw: up\ns: down\nspace: back to center\nmouse left-click and hold to direction\n");
+		glutKeyboardFunc(keyboard2);
+		glutMouseFunc(mouse);
+	} else {
+		return 0;
+	}
     glutMainLoop();
 
     /* ISO C requires main to return int */

@@ -1,5 +1,5 @@
 CC = gcc
-OBJ =merry-go-round.o LoadShader.o Matrix.o
+OBJ =merry-go-round.o LoadShader.o Matrix.o StringExtra.o OBJParser.o List.o
 CFLAGS = -g -Wall -Wextra
 
 LDLIBS=-lm -lglut -lGLEW -lGL
